@@ -432,47 +432,6 @@ if level & l_edit:
         )
 
 if level & l_edit:
-    # 更新日志
-    editcount2 = len(list(site.usercontributions("TeaSummerBot")))
-    log_page = site.pages["User:TeaSummerBot/Log"]  # 日志页面
-    editextra += (log_page.text().count("|-") - 10) * 2  # 需要修改（-N）
-    log_time = (
-        datetime.datetime.now()
-        .replace(tzinfo=pytz.timezone("Asia/Shanghai"))
-        .strftime("%Y-%m-%d %H:%M")
-    )  # 完成时间（UTC+8）
-    log_content = "检查bug模板"  # 内容
-    log_scope = f"多个命名空间（{'、'.join(nsl)}）"  # 页面范围
-    log_error = 0  # 执行数-意外【预设】
-    log_edit = editcount2 - editcount1 - editextra  # 执行数-编辑
-    log_total = edittotal  # 执行数-共计
-    log_note = "测试性"  # 备注【预设】
-    log_about = ""  # 关联话题或请求（如有）【预设】
-    if log_note == "" or log_note == "-" or log_note == "—":
-        log_note = "&ndash;"
-    if log_about == "" or log_about == "-" or log_about == "—":
-        log_about = "&ndash;"
-    log_addition = f"""
-|-
-| {log_time}
-| {log_content}
-| {log_scope}
-| {log_error}
-| {log_edit}
-| {log_total}
-| {log_note}
-| {log_about}
-|}}
-    """.strip()
-    log_version = log_page.text().replace("|}", log_addition)
-    if isbot and log_edit > 0:
-        log_page.edit(
-            log_version,
-            summary="机器人：更新bot日志",
-            minor=True,
-            bot=True,
-            section=None,
-        )
     # 更新虫洞
     hole_page = site.pages["User:TeaSummer/Bug_Hole"]  # 虫洞页面
     with open("data.txt") as f:
@@ -489,11 +448,10 @@ if level & l_edit:
 </choose><noinclude>{{{{documentation}}}}
 </noinclude>
     """.strip()
-    if log_edit > 0:
-        hole_page.edit(
-            hole_version,
-            summary=(("机器人：" if isbot else "") + "更新虫洞数据"),
-            minor=True,
-            bot=True if isbot else False,
-            section=None,
-        )
+    hole_page.edit(
+        hole_version,
+        summary=(("机器人：" if isbot else "") + "更新虫洞数据"),
+        minor=True,
+        bot=True if isbot else False,
+        section=None,
+    )
