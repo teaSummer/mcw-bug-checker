@@ -342,16 +342,16 @@ if level & l_edit:
             except:
                 logger.error(g2)
                 return
-        t = t.replace(
-            ref[0],
-            f"<ref{' ' + ref[1] if ref[1] else ''}>{g2}</ref>".replace("  ", " "),
-        )
         g2 = (
             g2.replace("@@@@@L@@@@@", "{")
             .replace("@@@@@R@@@@@", "}")
             .replace("@@@@@S@@@@@", "|")
             .replace("@@@@@M@@@@@", "<code>")
             .replace("@@@@@N@@@@@", "</code>")
+        )
+        t = t.replace(
+            ref[0],
+            f"<ref{' ' + ref[1] if ref[1] else ''}>{g2}</ref>".replace("  ", " "),
         )
 
         logger = get_logger(logging.INFO, False)
