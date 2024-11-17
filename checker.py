@@ -134,7 +134,9 @@ def wiki(page, isredirect=False):
                 r"minecraft.wiki/index.php?title=\2&action=raw",
                 page,
             )
-            r = requests.get(page_).text.strip()
+            o = os.system(f'curl -s "{page_}" > cache.txt')
+            with open("cache.txt", encoding="utf-8") as f:
+                r = f.read()
             redirect = re.findall(
                 r"^#.+?\[\[(.+?)\]\]$", r.strip().split("\n")[0].strip()
             )
@@ -261,10 +263,11 @@ if level & l_wiki:
     r = "\n".join(sorted(list(set(r.split("\n")))))
     with open("bugs.txt", "w") as f:
         f.write(r.strip())
+    os.remove("cache.txt")
 print()
 if level & l_check:
     current = 0
-    with open("bugs.txt", encoding="utf-8") as f:
+    with open("bugs.txt") as f:
         bugs = ";".join(f.read().strip().split())
     total = len(bugs.split(";"))
     for bug in bugs.split(";"):
