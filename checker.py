@@ -433,7 +433,7 @@ if level & l_edit:
 
 if level & l_edit:
     # 更新虫洞
-    hole_page = site.pages["User:TeaSummer/Bug_Hole"]  # 虫洞页面
+    hole_page = site.pages["User:TeaSummer/A Bug's Life"]  # 虫洞页面
     with open("data.txt") as f:
         hole_bugs = f.read()
     hole_bugs = (
@@ -450,7 +450,7 @@ if level & l_edit:
     """.strip()
     hole_page.edit(
         hole_version,
-        summary=(("机器人：" if isbot else "") + "更新虫洞数据"),
+        summary=(("机器人：" if isbot else "") + "更新虫虫危机数据"),
         minor=True,
         bot=True if isbot else False,
         section=None,
