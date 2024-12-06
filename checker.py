@@ -349,10 +349,11 @@ if level & l_edit:
             .replace("@@@@@M@@@@@", "<code>")
             .replace("@@@@@N@@@@@", "</code>")
         )
-        t = t.replace(
-            ref[0],
-            f"<ref{' ' + ref[1] if ref[1] else ''}>{g2}</ref>".replace("  ", " "),
-        )
+        if ref1[0].find("|archive=") == -1:
+            t = t.replace(
+                ref[0],
+                f"<ref{' ' + ref[1] if ref[1] else ''}>{g2}</ref>".replace("  ", " "),
+            )
 
         logger = get_logger(logging.INFO, False)
         logger.info(f"== {current}/{total} ==")
@@ -392,7 +393,7 @@ if level & l_edit:
                 ref1[0] = re.sub(
                     r"(@@@@@L@@@@@.*?)\|(.*?@@@@@R@@@@@)", r"\1@@@@@S@@@@@\2", ref1[0]
                 )
-            if ref1[0].find("#") == -1:
+            if ref1[0].find("#") == -1 and ref1[0].find("|archive=") == -1:
                 t = t.replace(z, ref1[0])
         for ref1 in re.findall(
             r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title)=[^}]+?}}</ref>)',
@@ -415,7 +416,7 @@ if level & l_edit:
                 + f"{ref1[2]}|{r_text if r_text else ''}|{r_title if r_title else ''}|{r_res if r_res else ''}"
                 + "}}"
             )
-            if ref1[0].find("#") == -1:
+            if ref1[0].find("#") == -1 and ref1[0].find("|archive=") == -1:
                 t = t.replace(ref1[0], f"<ref{ref1[1]}>{bugcode}</ref>")
         for ref in re.findall(
             r'(<ref( *name=".*?")? *>\{\{bug\|([A-Z0-9-]+?)(\|([^<]+?)}}</ref>|}}</ref>))',
@@ -432,8 +433,8 @@ if level & l_edit:
         )
 
 if level & l_edit:
-    # 更新虫洞
-    hole_page = site.pages["User:TeaSummer/A Bug's Life"]  # 虫洞页面
+    # 更新虫虫危机
+    hole_page = site.pages["User:TeaSummer/A Bug's Life"]
     with open("data.txt") as f:
         hole_bugs = f.read()
     hole_bugs = (
