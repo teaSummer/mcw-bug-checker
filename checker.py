@@ -1,10 +1,18 @@
 import colorlog, logging
 import datetime, pytz
-import json, re
+import regex as re
+import json
 import os, sys
 import requests, urllib.parse
 from mwclient import Site
-from TS import I
+
+
+def I(string):
+    def r(m):
+        return "[" + m.group(1).upper() + m.group(1).lower() + "]"
+
+    return re.sub("([a-zA-Z])", r, string)
+
 
 # 配置
 lang = "zh"  # lang = "en"
