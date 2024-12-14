@@ -4,6 +4,7 @@ import json, re
 import os, sys
 import requests, urllib.parse
 from mwclient import Site
+from TS import I
 
 # 配置
 lang = "zh"  # lang = "en"
@@ -177,6 +178,7 @@ def wiki(page, isredirect=False):
             ref1[0] = (
                 ref1[0]
                 .replace("{{bug|", "@@@@@A@@@@@")
+                .replace("{{Bug|", "@@@@@A@@@@@")
                 .replace("}}</ref>", "@@@@@B@@@@@")
                 .replace("{", "@@@@@L@@@@@")
                 .replace("}", "@@@@@R@@@@@")
@@ -278,7 +280,9 @@ print()
 if level & l_edit:
     current = 0
     edittotal = total = len(pages)
-    status = "([Ww]on'?t [Ff]ix|WF|WAI|wai|[Ww]orks [Aa]s [Ii]ntended|[Ff]ixed|[Cc]annot [Rr]eproduce|[Aa]waiting [Rr]esponse|[Dd]uplicate|[Ii]ncomplete|[Ii]nvalid|[Rr]esolved|[Uu]nresolved|已修复|不予修复)"
+    status = I(
+        "(Won'?t Fix|WF|WAI|Works As Intended|Fixed|Cannot Reproduce|Awaiting Response|Duplicate|Incomplete|Invalid|Resolved|Unresolved|已修复|不予修复)"
+    )
     pattern = r"\|\|?{s}|res={s}".format(s=status)
     with open("data.txt") as f:
         r = f.read()
@@ -290,12 +294,12 @@ if level & l_edit:
 
     def parse():
         global t
-        g1 = re.sub(pattern, "", ref[4].strip(), re.I)
+        g1 = re.sub(pattern, "", ref[4].strip())
         g1 = "{{bug|" + f"{ref[2].strip()}|{g1 if g1 else ''}"
         g2 = g1
 
         # before
-        before = re.search(pattern, ref[4].strip(), re.I)
+        before = re.search(pattern, ref[4].strip())
         if before:
             g1 += before[0].replace("res=", "")
         g1 = g1.removesuffix("|") + "}}"
@@ -312,7 +316,7 @@ if level & l_edit:
             )
         g2 = g2.replace("|}}", "}}")
         g2 = re.sub(
-            f"bug\\|{ref[2].strip()}" + r"\|(\|?)([^|]+)\|\|\|",
+            f"[Bb]ug\\|{ref[2].strip()}" + r"\|(\|?)([^|]+)\|\|\|",
             f"bug|{ref[2].strip()}" + r"|\1\2|",
             g2,
         )
@@ -335,7 +339,7 @@ if level & l_edit:
                     "name"
                 ]
                 g2 = re.sub(
-                    r"\{\{bug\|[A-Za-z0-9-]+\|(.+?)\|(.+?)\|.+?}}",
+                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.+?)\|(.+?)\|.+?}}",
                     "{{" + f"bug|{dup}|\\1|\\2|{dup_res}" + "}}",
                     g2,
                 )
@@ -381,6 +385,7 @@ if level & l_edit:
             ref1[0] = (
                 ref1[0]
                 .replace("{{bug|", "@@@@@A@@@@@")
+                .replace("{{Bug|", "@@@@@A@@@@@")
                 .replace("}}</ref>", "@@@@@B@@@@@")
                 .replace("{", "@@@@@L@@@@@")
                 .replace("}", "@@@@@R@@@@@")
@@ -439,6 +444,7 @@ if level & l_edit:
         hole_bugs = f.read()
     hole_bugs = (
         hole_bugs.replace("{{bug|", "<option>")
+        .replace("{{Bug|", "<option>")
         .replace("|||", "|")
         .replace("}}", "</option>")
     )
