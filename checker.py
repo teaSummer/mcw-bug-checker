@@ -48,7 +48,15 @@ for i in range(len(nsl)):
     nsl[i] = str(nsl[i])
 for ns in nsl:
     for page in site.search(
-        r'insource:/\<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+?)(\|[^\<]+?}}\<\/ref>|}}\<\/ref>)|\<ref( *name=".*?")? *>\{\{bug\|[^{}]+\|(title|text|res)=[^}]+?}}\<\/ref>|\<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(\<\/code>|[^\<])+?}}\<\/ref>/',
+        " -".join(
+            [
+                r'insource:/\<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+?)(\|[^\<]+?}}\<\/ref>|}}\<\/ref>)|\<ref( *name=".*?")? *>\{\{bug\|[^{}]+\|(title|text|res)=[^}]+?}}\<\/ref>|\<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(\<\/code>|[^\<])+?}}\<\/ref>/',
+                r'intitle:"*前"',
+                r"intitle:/[^洋]（旧版）/",
+                r'hastemplate:"Joke_feature"',
+                r'hastemplate:"April_Fools"',
+            ]
+        ),
         namespace=ns,
     ):
         if ns == 4 and page.get("title").find("/") == -1:
@@ -361,7 +369,7 @@ if level & l_edit:
             .replace("@@@@@M@@@@@", "<code>")
             .replace("@@@@@N@@@@@", "</code>")
         )
-        if ref1[0].find("|archive=") == -1:
+        if ref[0].find("|archive=") == -1:
             t = t.replace(
                 ref[0],
                 f"<ref{' ' + ref[1] if ref[1] else ''}>{g2}</ref>".replace("  ", " "),
