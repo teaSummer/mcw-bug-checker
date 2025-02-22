@@ -1,4 +1,4 @@
-name: Bug checker (Legacy)
+name: Bug checker
 
 on:
   schedule:
@@ -19,14 +19,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Check bug templates (Legacy)
+      - name: Check bug templates
         run: |
           # python checker-legacy.py "${{ secrets.OWNER_PASSWORD }}"
+          # python checker.py "${{ secrets.OWNER_PASSWORD }}"
           python checker-legacy.py "${{ secrets.BOT_PASSWORD }}"
+          python checker.py "${{ secrets.BOT_PASSWORD }}"
       - name: Get date
         run: |
           echo "CURRENT_DATE=$(date '+%Y-%m-%d UTC')" >> $GITHUB_ENV
-      - name: Commit
+      - name: Commit & Push
         uses: EndBug/add-and-commit@main
         with:
           default_author: github_actions

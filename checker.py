@@ -7,6 +7,13 @@ import requests, urllib.parse
 from mwclient import Site
 
 
+def I(string):
+    def r(m):
+        return "[" + m.group(1).upper() + m.group(1).lower() + "]"
+
+    return re.sub("([a-zA-Z])", r, string)
+
+
 # 配置
 lang = "zh"  # lang = "en"
 max_retries = 3  # 最大重试次数
@@ -25,9 +32,16 @@ nsl = [
 # 级别：wiki、check、edit
 l_wiki = 0b0001  # 获取wiki条目中参考的bug
 l_check = 0b0010  # 检查bug模板
+l_edit = 0b0100  # 编辑wiki条目
 
 
 site = Site(f"{lang + '.' if lang != 'en' else ''}minecraft.wiki", path="/")
+if level & l_edit:
+    password = sys.argv[1]
+    # site.login("TeaSummer", password)
+    site.login("TeaSummerBot", password)
+    editcount1 = len(list(site.usercontributions("TeaSummerBot")))
+    isbot = site.username.lower().endswith("bot")
 pages = []
 for i in range(len(nsl)):
     nsl[i] = str(nsl[i])
@@ -48,12 +62,6 @@ for ns in nsl:
             continue
         pages.append(page.get("title"))
 pages = sorted(list(set(pages)))
-
-try:
-    os.remove("data.txt")
-    os.remove("bugs.txt")
-except:
-    pass
 
 
 def get_logger(level=logging.INFO, prefix=True):
@@ -86,6 +94,22 @@ def get_logger(level=logging.INFO, prefix=True):
         logger.removeHandler(handler)
     logger.addHandler(console_handler)
     return logger
+
+
+def mojira(bug):
+    r = requests.post(
+        "https://bugs.mojang.com/api/jql-search-post",
+        data=json.dumps(
+            {
+                "advanced": True,
+                "project": bug.split("-", 1)[0],
+                "search": "key = " + bug,
+                "maxResults": 1,
+            }
+        ),
+        headers={"Content-Type": "application/json"},
+    ).text.strip()
+    return json.loads(r)
 
 
 def wiki(page, isredirect=False):
@@ -225,10 +249,7 @@ def check(bug):
     global retries
     bug = bug.strip()
     try:
-        r = requests.get(
-            f"https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{bug}&fields=resolution"
-        ).text.strip()
-        r = json.loads(r)
+        r = mojira(bug)
         if r["issues"][0]["fields"]["resolution"]:
             status = "|||" + r["issues"][0]["fields"]["resolution"]["name"]
             status = status.replace("Won&#39;t Fix", "Won't Fix").replace(
@@ -277,3 +298,182 @@ if level & l_check:
         retries = 0
         current += 1
         check(bug)
+print()
+if level & l_edit:
+    current = 0
+    edittotal = total = len(pages)
+    status = I(
+        "(Won'?t Fix|WF|WAI|Works As Intended|Fixed|Cannot Reproduce|Awaiting Response|Duplicate|Incomplete|Invalid|Resolved|Unresolved|已修复|不予修复)"
+    )
+    pattern = r"\|\|?{s}|res={s}".format(s=status)
+    with open("data.txt") as f:
+        r = f.read()
+    start = 1  # 从第N个页面开始编辑
+    limit = -1  # 最多编辑N个页面
+    if limit == -1:
+        limit = total
+    maxpage = start - 1 + limit
+
+    def parse():
+        global t
+        g1 = re.sub(pattern, "", ref[4].strip())
+        g1 = "{{bug|" + f"{ref[2].strip()}|{g1 if g1 else ''}"
+        g2 = g1
+
+        # before
+        before = re.search(pattern, ref[4].strip())
+        if before:
+            g1 += before[0].replace("res=", "")
+        g1 = g1.removesuffix("|") + "}}"
+        # now
+        now = re.search(r"bug\|" + ref[2].strip() + r"(\|\|\|[^|}]+)?}}", r, re.I)
+        if g2.endswith("|"):
+            g2 += "|"
+        if now and now[1]:
+            g2 += "|" + now[1].removeprefix("|||")
+        g2 = g2.strip("|") + "}}"
+        if g2.count("|") == 3 and g2.find("||") == -1:
+            g2 = g2.replace("|", "||").replace(
+                f"|{ref[2].strip()}||", f"{ref[2].strip()}|"
+            )
+        g2 = g2.replace("|}}", "}}")
+        g2 = re.sub(
+            f"[Bb]ug\\|{ref[2].strip()}" + r"\|(\|?)([^|]+)\|\|\|",
+            f"bug|{ref[2].strip()}" + r"|\1\2|",
+            g2,
+        )
+        if g2.find("Duplicate") != -1:
+            dup = mojira(ref[2].strip())
+            try:
+                dup = str(dup["issues"][0]["fields"]["issuelinks"][0])
+                dup = (
+                    dup.split("'outwardIssue': {")[1]
+                    .split("'self':")[0]
+                    .split("'key':")[1]
+                    .strip("' ,")
+                )
+                dup_res = mojira(dup)["issues"][0]["fields"]["resolution"]["name"]
+                g2 = re.sub(
+                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.+?)\|(.+?)\|.+?}}",
+                    "{{" + f"bug|{dup}|\\1|\\2|{dup_res}" + "}}",
+                    g2,
+                )
+            except:
+                logger.error(g2)
+                return
+        g2 = (
+            g2.replace("@@@@@L@@@@@", "{")
+            .replace("@@@@@R@@@@@", "}")
+            .replace("@@@@@S@@@@@", "|")
+            .replace("@@@@@M@@@@@", "<code>")
+            .replace("@@@@@N@@@@@", "</code>")
+        )
+        if ref[0].find("|archive=") == -1:
+            t = t.replace(
+                ref[0],
+                f"<ref{' ' + ref[1] if ref[1] else ''}>{g2}</ref>".replace("  ", " "),
+            )
+
+        logger = get_logger(logging.INFO, False)
+        logger.info(f"== {current}/{total} ==")
+        if len(g2) > len(g1):
+            logger.info(f"{g1} => {g2}")
+        elif g2.count("|") == g1.count("|"):
+            logger.warning(f"{g1} => {g2}")
+        else:
+            logger.error(f"{g1} => {g2}")
+
+    for page in pages[start - 1 : maxpage]:
+        retries = 0
+        current += 1
+        logger = get_logger()
+        _page = site.pages[page]
+        t = _page.text()
+        # 处理少数情况
+        for ref1 in re.findall(
+            r'(<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(</code>|[^<])+?}}</ref>)',
+            t,
+            re.I,
+        ):
+            z = ref1[0]
+            ref1 = list(ref1)
+            ref1[0] = (
+                ref1[0]
+                .replace("{{bug|", "@@@@@A@@@@@")
+                .replace("{{Bug|", "@@@@@A@@@@@")
+                .replace("}}</ref>", "@@@@@B@@@@@")
+                .replace("{", "@@@@@L@@@@@")
+                .replace("}", "@@@@@R@@@@@")
+                .replace("@@@@@A@@@@@", "{{bug|")
+                .replace("@@@@@B@@@@@", "}}</ref>")
+                .replace("<code>", "@@@@@M@@@@@")
+                .replace("</code>", "@@@@@N@@@@@")
+            )
+            while len(re.findall(r"(@@@@@L@@@@@.*?)\|(.*?@@@@@R@@@@@)", ref1[0])):
+                ref1[0] = re.sub(
+                    r"(@@@@@L@@@@@.*?)\|(.*?@@@@@R@@@@@)", r"\1@@@@@S@@@@@\2", ref1[0]
+                )
+            if ref1[0].find("#") == -1 and ref1[0].find("|archive=") == -1:
+                t = t.replace(z, ref1[0])
+        for ref1 in re.findall(
+            r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title)=[^}]+?}}</ref>)',
+            t,
+            re.I,
+        ):
+            r_res, r_text, r_title = (
+                re.search(r"\|res=([^|}]+)", ref1[0], re.I),
+                re.search(r"\|text=([^|}]+)", ref1[0], re.I),
+                re.search(r"\|title=([^|}]+)", ref1[0], re.I),
+            )
+            if r_res:
+                r_res = r_res.group(1)
+            if r_text:
+                r_text = r_text.group(1)
+            if r_title:
+                r_title = r_title.group(1)
+            bugcode = (
+                "{{bug|"
+                + f"{ref1[2]}|{r_text if r_text else ''}|{r_title if r_title else ''}|{r_res if r_res else ''}"
+                + "}}"
+            )
+            if ref1[0].find("#") == -1 and ref1[0].find("|archive=") == -1:
+                t = t.replace(ref1[0], f"<ref{ref1[1]}>{bugcode}</ref>")
+        for ref in re.findall(
+            r'(<ref( *name=".*?")? *>\{\{bug\|([A-Z0-9-]+?)(\|([^<]+?)}}</ref>|}}</ref>))',
+            t,
+            re.I,
+        ):
+            parse()
+        _page.edit(
+            t,
+            summary=(("机器人：" if isbot else "") + "检查bug模板"),
+            minor=True,
+            bot=True if isbot else False,
+            section=None,
+        )
+
+if level & l_edit:
+    # 更新虫虫危机
+    hole_page = site.pages["User:TeaSummer/A Bug's Life"]
+    with open("data.txt") as f:
+        hole_bugs = f.read()
+    hole_bugs = (
+        hole_bugs.replace("{{bug|", "<option>")
+        .replace("{{Bug|", "<option>")
+        .replace("|||", "|")
+        .replace("}}", "</option>")
+    )
+    hole_version = f"""
+<choose uncached>
+{hole_bugs}
+<choicetemplate>User:TeaSummer/Bug|hole=1</choicetemplate>
+</choose><noinclude>{{{{documentation}}}}
+</noinclude>
+    """.strip()
+    hole_page.edit(
+        hole_version,
+        summary=(("机器人：" if isbot else "") + "更新虫虫危机数据"),
+        minor=True,
+        bot=True if isbot else False,
+        section=None,
+    )
