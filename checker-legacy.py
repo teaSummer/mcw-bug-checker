@@ -17,7 +17,7 @@ def I(string):
 # 配置
 lang = "zh"  # lang = "en"
 max_retries = 3  # 最大重试次数
-level = 0b0111  # 全自动
+level = 0b0011  ## 全自动
 editextra = 0  # 额外编辑数
 nsl = [
     0,
@@ -241,7 +241,7 @@ def check(bug):
     bug = bug.strip()
     try:
         r = requests.get(
-            f"https://bugs.mojang.com/rest/api/2/search?jql=issue%20%3D%20{bug}&fields=resolution"
+            f"https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{bug}&fields=resolution"
         ).text.strip()
         r = json.loads(r)
         if r["issues"][0]["fields"]["resolution"]:
@@ -338,7 +338,7 @@ if level & l_edit:
         )
         if g2.find("Duplicate") != -1:
             dup = requests.get(
-                f"https://bugs.mojang.com/rest/api/2/search?jql=issue%20%3D%20{ref[2].strip()}&fields=issuelinks"
+                f"https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{ref[2].strip()}&fields=issuelinks"
             ).text.strip()
             try:
                 dup = str(json.loads(dup)["issues"][0]["fields"]["issuelinks"][0])
@@ -349,7 +349,7 @@ if level & l_edit:
                     .strip("' ,")
                 )
                 dup_res = requests.get(
-                    f"https://bugs.mojang.com/rest/api/2/search?jql=issue%20%3D%20{dup}&fields=resolution"
+                    f"https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{dup}&fields=resolution"
                 ).text.strip()
                 dup_res = json.loads(dup_res)["issues"][0]["fields"]["resolution"][
                     "name"
