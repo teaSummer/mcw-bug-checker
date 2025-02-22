@@ -286,6 +286,10 @@ def check(bug):
         logger.warning(f"Retrying {bug} - {retries+1}/{max_retries}")
         retries += 1
         if retries >= max_retries:
+            with open("bugs.txt") as f:
+                r = f.read()
+            with open("bugs.txt", "w") as f:
+                f.write(re.sub(bug + r"\n?", "", r))
             logger.error(f"({current}/{total}) Occured when processing {bug}")
         else:
             check(bug)
