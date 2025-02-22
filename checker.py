@@ -17,7 +17,7 @@ def I(string):
 # 配置
 lang = "zh"  # lang = "en"
 max_retries = 3  # 最大重试次数
-level = 0b0011  # 全自动
+level = 0b0111  # 全自动
 nsl = [
     0,
     4,
@@ -105,7 +105,7 @@ def get_logger(level=logging.INFO, prefix=True):
 def mojira(bug, always_legacy=False):
     def legacy(bug):
         r = requests.get(
-            "https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{bug}"
+            f"https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{bug}"
         ).text.strip()
         return json.loads(r)
 
