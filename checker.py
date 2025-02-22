@@ -63,6 +63,12 @@ for ns in nsl:
         pages.append(page.get("title"))
 pages = sorted(list(set(pages)))
 
+try:
+    os.remove("data.txt")
+    os.remove("bugs.txt")
+except:
+    pass
+
 
 def get_logger(level=logging.INFO, prefix=True):
     logger = logging.getLogger()
@@ -96,19 +102,31 @@ def get_logger(level=logging.INFO, prefix=True):
     return logger
 
 
-def mojira(bug):
-    r = requests.post(
-        "https://bugs.mojang.com/api/jql-search-post",
-        data=json.dumps(
-            {
-                "advanced": True,
-                "project": bug.split("-", 1)[0],
-                "search": "key = " + bug,
-                "maxResults": 1,
-            }
-        ),
-        headers={"Content-Type": "application/json"},
-    ).text.strip()
+def mojira(bug, always_legacy=False):
+    def legacy(bug):
+        r = requests.get(
+            "https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{bug}"
+        ).text.strip()
+        return json.loads(r)
+
+    if always_legacy:
+        return legacy(bug)
+    try:
+        r = requests.post(
+            "https://bugs.mojang.com/api/jql-search-post",
+            data=json.dumps(
+                {
+                    "advanced": True,
+                    "project": bug.split("-", 1)[0],
+                    "search": "key = " + bug,
+                    "maxResults": 1,
+                }
+            ),
+            headers={"Content-Type": "application/json"},
+        ).text.strip()
+        _ = json.loads(r)["issues"][0]
+    except:
+        return legacy(bug)
     return json.loads(r)
 
 
@@ -343,7 +361,7 @@ if level & l_edit:
             g2,
         )
         if g2.find("Duplicate") != -1:
-            dup = mojira(ref[2].strip())
+            dup = mojira(ref[2].strip(), True)
             try:
                 dup = str(dup["issues"][0]["fields"]["issuelinks"][0])
                 dup = (
@@ -352,7 +370,7 @@ if level & l_edit:
                     .split("'key':")[1]
                     .strip("' ,")
                 )
-                dup_res = mojira(dup)["issues"][0]["fields"]["resolution"]["name"]
+                dup_res = mojira(dup, True)["issues"][0]["fields"]["resolution"]["name"]
                 g2 = re.sub(
                     r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.+?)\|(.+?)\|.+?}}",
                     "{{" + f"bug|{dup}|\\1|\\2|{dup_res}" + "}}",

@@ -21,9 +21,7 @@ jobs:
           pip install -r requirements.txt
       - name: Check bug templates
         run: |
-          # python checker-legacy.py "${{ secrets.OWNER_PASSWORD }}"
           # python checker.py "${{ secrets.OWNER_PASSWORD }}"
-          python checker-legacy.py "${{ secrets.BOT_PASSWORD }}"
           python checker.py "${{ secrets.BOT_PASSWORD }}"
       - name: Get date
         run: |
