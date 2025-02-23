@@ -365,6 +365,8 @@ if level & l_edit:
         g1 = g1.removesuffix("|") + "}}"
         # now
         now = re.search(r"bug\|" + ref[2].strip() + r"(\|\|\|[^|}]+)?}}", r, re.I)
+        if not now:
+            return
         if g2.endswith("|"):
             g2 += "|"
         if now and now[1]:
