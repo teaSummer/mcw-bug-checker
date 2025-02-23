@@ -366,6 +366,13 @@ if level & l_edit:
         # now
         now = re.search(r"bug\|" + ref[2].strip() + r"(\|\|\|[^|}]+)?}}", r, re.I)
         if not now:
+            t = (
+                t.replace("@@@@@L@@@@@", "{")
+                .replace("@@@@@R@@@@@", "}")
+                .replace("@@@@@S@@@@@", "|")
+                .replace("@@@@@M@@@@@", "<code>")
+                .replace("@@@@@N@@@@@", "</code>")
+            )
             return
         if g2.endswith("|"):
             g2 += "|"
