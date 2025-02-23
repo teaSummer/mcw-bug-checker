@@ -264,7 +264,7 @@ def wiki(page, isredirect=False):
 
 
 def check(bug):
-    global retries
+    global retries, cleans
     bug = bug.strip()
     try:
         r = mojira(bug)
@@ -286,10 +286,7 @@ def check(bug):
         logger.warning(f"Retrying {bug} - {retries+1}/{max_retries}")
         retries += 1
         if retries >= max_retries:
-            with open("bugs.txt") as f:
-                r = f.read() + "\n"
-            with open("bugs.txt", "w") as f:
-                f.write(re.sub(bug + r"\n", "", r).strip())
+            cleans.append(bug)
             logger.error(f"({current}/{total}) Occured when processing {bug}")
         else:
             check(bug)
@@ -313,13 +310,19 @@ if level & l_wiki:
 print()
 if level & l_check:
     current = 0
+    cleans = []
     with open("bugs.txt") as f:
         bugs = ";".join(f.read().strip().split())
+        cr = f.read().strip() + "\n"
     total = len(bugs.split(";"))
     for bug in bugs.split(";"):
         retries = 0
         current += 1
         check(bug)
+    for i in cleans:
+        cr = re.sub(i + r"\n", "", cr)
+    with open("bugs.txt", "w") as f:
+        f.write(cr.strip())
 print()
 if level & l_edit:
     current = 0
