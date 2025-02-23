@@ -267,6 +267,18 @@ def check(bug):
     global retries, cleans
     bug = bug.strip()
     try:
+        if bug.split("-")[0] in [
+            "ARCHMCPE",
+            "MCAPI",
+            "MCCE",
+            "MCD",
+            "MCDS",
+            "MCE",
+            "MCLG",
+            "SC",
+        ]:
+            retries = max_retries
+            raise NameError
         r = mojira(bug)
         if r["issues"][0]["fields"]["resolution"]:
             status = "|||" + r["issues"][0]["fields"]["resolution"]["name"]
@@ -283,7 +295,8 @@ def check(bug):
                 f.write("{{bug|" + bug + "}}\n")
             logger.info(f"({current}/{total}) " + "{{bug|" + bug + "}}")
     except Exception as err:
-        logger.warning(f"Retrying {bug} - {retries+1}/{max_retries}")
+        if type(err) != NameError:
+            logger.warning(f"Retrying {bug} - {retries+1}/{max_retries}")
         retries += 1
         if retries >= max_retries:
             cleans.append(bug)
