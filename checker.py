@@ -287,9 +287,9 @@ def check(bug):
         retries += 1
         if retries >= max_retries:
             with open("bugs.txt") as f:
-                r = f.read()
+                r = f.read() + "\n"
             with open("bugs.txt", "w") as f:
-                f.write(re.sub(bug + r"\n?", "", r))
+                f.write(re.sub(bug + r"\n", "", r).strip())
             logger.error(f"({current}/{total}) Occured when processing {bug}")
         else:
             check(bug)
