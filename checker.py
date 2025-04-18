@@ -436,6 +436,7 @@ if level & l_edit:
         logger = get_logger()
         _page = site.pages[page]
         t = _page.text()
+        t_bak = t
         # 处理少数情况
         for ref1 in re.findall(
             r'(<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(</code>|[^<])+?}}</ref>)',
@@ -491,6 +492,8 @@ if level & l_edit:
             re.I,
         ):
             parse()
+        if t == t_bak:
+            continue
         _page.edit(
             t,
             summary=(("机器人：" if isbot else "") + "检查bug模板"),
