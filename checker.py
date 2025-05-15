@@ -405,6 +405,7 @@ if level & l_edit:
                     "{{" + f"bug|{dup}|\\1|\\2|{dup_res}" + "}}",
                     g2,
                 )
+                g2 = g2.replace(ref[2].strip(), dup)
             except:
                 logger = get_logger()
                 logger.error(g2)
