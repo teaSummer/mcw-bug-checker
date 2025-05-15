@@ -401,11 +401,15 @@ if level & l_edit:
                 )
                 dup_res = mojira(dup)["issues"][0]["fields"]["resolution"]["name"]
                 g2 = re.sub(
-                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.+?)\|(.+?)\|.+?}}",
+                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.*?)\|(.*?)\|.*?}}",
                     "{{" + f"bug|{dup}|\\1|\\2|{dup_res}" + "}}",
                     g2,
                 )
-                g2 = g2.replace(ref[2].strip(), dup)
+                g2 = re.sub(
+                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+}}",
+                    "{{" + f"bug|{dup}|{dup_res}" + "}}",
+                    g2,
+                )
             except:
                 logger = get_logger()
                 logger.error(g2)
