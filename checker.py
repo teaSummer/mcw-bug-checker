@@ -102,31 +102,27 @@ def get_logger(level=logging.INFO, prefix=True):
     return logger
 
 
-def mojira(bug, always_legacy=False):
+def mojira(bug, legacy_mode=False):
     def legacy(bug):
         r = requests.get(
             f"https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{bug}"
         ).text.strip()
         return json.loads(r)
 
-    if always_legacy:
+    if legacy_mode:
         return legacy(bug)
-    try:
-        r = requests.post(
-            "https://bugs.mojang.com/api/jql-search-post",
-            data=json.dumps(
-                {
-                    "advanced": True,
-                    "project": bug.split("-", 1)[0],
-                    "search": "key = " + bug,
-                    "maxResults": 1,
-                }
-            ),
-            headers={"Content-Type": "application/json"},
-        ).text.strip()
-        _ = json.loads(r)["issues"][0]
-    except:
-        return legacy(bug)
+    r = requests.post(
+        "https://bugs.mojang.com/api/jql-search-post",
+        data=json.dumps(
+            {
+                "advanced": True,
+                "project": bug.split("-", 1)[0],
+                "search": "key = " + bug,
+                "maxResults": 1,
+            }
+        ),
+        headers={"Content-Type": "application/json"},
+    ).text.strip()
     return json.loads(r)
 
 
@@ -401,15 +397,11 @@ if level & l_edit:
                 )
                 dup_res = mojira(dup)["issues"][0]["fields"]["resolution"]["name"]
                 g2 = re.sub(
-                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.*?)\|(.*?)\|.*?}}",
+                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.+?)\|(.+?)\|.+?}}",
                     "{{" + f"bug|{dup}|\\1|\\2|{dup_res}" + "}}",
                     g2,
                 )
-                g2 = re.sub(
-                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+}}",
-                    "{{" + f"bug|{dup}|{dup_res}" + "}}",
-                    g2,
-                )
+                g2 = g2.replace(ref[2].strip(), dup)
             except:
                 logger = get_logger()
                 logger.error(g2)
