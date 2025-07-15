@@ -16,11 +16,10 @@ def I(string):
 
 # 配置
 lang = "zh"  # lang = "en"
-max_retries = 3  # 最大重试次数
+max_tries = 3  # 最大重试次数
 level = 0b0111  # 全自动
 nsl = [
     0,
-    4,
     9994,
     9996,
     9998,
@@ -140,7 +139,7 @@ def wiki(page, isredirect=False):
             )
         )
 
-    global retries
+    global tries
     page = page.strip()
     try:
         pattern_interwiki = (
@@ -249,9 +248,9 @@ def wiki(page, isredirect=False):
             logger.warning(f"Redirecting {shorten(page_backup)} to {shorten(page)}")
             wiki(page, isredirect=True)
         else:
-            retries += 1
-            logger.warning(f"Retrying {shorten(page)} - {retries}/{max_retries}")
-            if retries >= max_retries:
+            tries += 1
+            logger.warning(f"Retrying {shorten(page)} - {tries}/{max_tries}")
+            if tries >= max_tries:
                 logger.error(
                     f"({current}/{total}) Occured when processing {shorten(page)}"
                 )
@@ -260,7 +259,7 @@ def wiki(page, isredirect=False):
 
 
 def check(bug):
-    global retries, cleans
+    global tries, cleans
     bug = bug.strip()
     try:
         if bug.split("-")[0] in [
@@ -273,7 +272,7 @@ def check(bug):
             "MCLG",
             "SC",
         ]:
-            retries = max_retries
+            tries = max_tries
             raise NameError
         r = mojira(bug)
         if r["issues"][0]["fields"]["resolution"]:
@@ -292,9 +291,9 @@ def check(bug):
             logger.info(f"({current}/{total}) " + "{{bug|" + bug + "}}")
     except Exception as err:
         if type(err) != NameError:
-            logger.warning(f"Retrying {bug} - {retries+1}/{max_retries}")
-        retries += 1
-        if retries >= max_retries:
+            logger.warning(f"Retrying {bug} - {tries+1}/{max_tries}")
+        tries += 1
+        if tries >= max_tries:
             cleans.append(bug)
             logger.error(f"({current}/{total}) Occured when processing {bug}")
         else:
@@ -307,7 +306,7 @@ if level & l_wiki:
     current = 0
     total = len(pages)
     for page in pages:
-        retries = 0
+        tries = 0
         current += 1
         wiki(page)
     with open("bugs.txt") as f:
@@ -325,7 +324,7 @@ if level & l_check:
         cr = f.read().strip() + "\n"
     total = len(bugs.split(";"))
     for bug in bugs.split(";"):
-        retries = 0
+        tries = 0
         current += 1
         check(bug)
     for i in cleans:
@@ -429,7 +428,7 @@ if level & l_edit:
             logger.error(f"{g1} => {g2}")
 
     for page in pages[start - 1 : maxpage]:
-        retries = 0
+        tries = 0
         current += 1
         logger = get_logger()
         _page = site.pages[page]
