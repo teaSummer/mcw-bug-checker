@@ -27,7 +27,8 @@ nsl = [
     10002,
     10004,
     10006,
-]  # 默认命名空间、Minecraft Wiki命名空间
+    10010,
+]  # 默认命名空间
 # 级别：wiki、check、edit
 l_wiki = 0b0001  # 获取wiki条目中参考的bug
 l_check = 0b0010  # 检查bug模板
@@ -36,10 +37,11 @@ l_edit = 0b0100  # 编辑wiki条目
 
 site = Site(f"{lang + '.' if lang != 'en' else ''}minecraft.wiki", path="/")
 if level & l_edit:
-    password = sys.argv[1]
-    # site.login("TeaSummer", password)
-    site.login("TeaSummerBot", password)
-    editcount1 = len(list(site.usercontributions("TeaSummerBot")))
+    bot_password = os.getenv("BOT_PASSWORD")
+    owner_password = os.getenv("OWNER_PASSWORD")
+    # site.login("TeaSummer", owner_password)
+    site.login("TeaEvebot", bot_password)
+    # editcount1 = len(list(site.usercontributions("TeaEvebot")))
     isbot = site.username.lower().endswith("bot")
 pages = []
 for i in range(len(nsl)):

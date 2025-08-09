@@ -14,17 +14,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@main
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Check bug templates
         run: |
-          # python checker.py "${{ secrets.OWNER_PASSWORD }}"
-          python checker.py "${{ secrets.BOT_PASSWORD }}"
-      - name: Get date
-        run: |
+          python checker.py
           echo "CURRENT_DATE=$(date '+%Y-%m-%d UTC')" >> $GITHUB_ENV
       - name: Commit & Push
         uses: EndBug/add-and-commit@main
