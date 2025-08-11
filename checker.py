@@ -338,7 +338,7 @@ if level & l_edit:
     current = 0
     edittotal = total = len(pages)
     status = I(
-        "(Won'?t Fix|WF|WAI|Works As Intended|Fixed|Cannot Reproduce|Awaiting Response|Duplicate|Incomplete|Invalid|Resolved|Unresolved|已修复|不予修复)"
+        "(AR|CR|WAI|WD|WF|Won'?t Fix|Works As Intended|Fixed|Cannot Reproduce|Awaiting Response|Duplicate|Incomplete|Invalid|Resolved|Unresolved|Won'?t Do|Done|已修复|不予修复)"
     )
     pattern = r"\|\|?{s}|res={s}".format(s=status)
     with open("data.txt") as f:
