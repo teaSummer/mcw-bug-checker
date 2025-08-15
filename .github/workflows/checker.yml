@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+      OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}
 
     steps:
       - uses: actions/checkout@main
