@@ -389,20 +389,16 @@ if level & l_edit:
         if g2.find("Duplicate") != -1:
             dup = mojira(ref[2].strip())
             try:
-                dup = str(dup["issues"][0]["fields"]["issuelinks"][0])
-                dup = (
-                    dup.split("'outwardIssue': {")[1]
-                    .split("'self':")[0]
-                    .split("'key':")[1]
-                    .strip("' ,")
-                )
-                dup_res = mojira(dup)["issues"][0]["fields"]["resolution"]["name"]
+                dup = dup["issues"][0]["fields"]["issuelinks"][0]["outwardIssue"]["key"]
+                dup_res = mojira(dup)["issues"][0]["fields"]["resolution"]
+                if dup_res:
+                    dup_res = "|" + dup_res["name"]
                 g2 = re.sub(
                     r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.+?)\|(.+?)\|.+?}}",
-                    "{{" + f"bug|{dup}|\\1|\\2|{dup_res}" + "}}",
+                    "{{" + f"bug|{dup}|\\1|\\2{dup_res or ""}",
                     g2,
                 )
-                g2 = g2.replace(ref[2].strip(), dup)
+                g2 = g2.strip("|") + "}}"
             except:
                 logger = get_logger()
                 logger.error(g2)
