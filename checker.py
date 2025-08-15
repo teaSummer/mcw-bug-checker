@@ -261,7 +261,7 @@ def wiki(page, isredirect=False):
 
 
 def check(bug):
-    global tries, cleans
+    global tries
     bug = bug.strip()
     try:
         if bug.split("-")[0] in [
@@ -296,7 +296,6 @@ def check(bug):
             logger.warning(f"Retrying {bug} - {tries+1}/{max_tries}")
         tries += 1
         if tries >= max_tries:
-            cleans.append(bug)
             logger.error(f"({current}/{total}) Occured when processing {bug}")
         else:
             check(bug)
@@ -320,19 +319,13 @@ if level & l_wiki:
 print()
 if level & l_check:
     current = 0
-    cleans = []
     with open("bugs.txt") as f:
         bugs = ";".join(f.read().strip().split())
-        cr = f.read().strip() + "\n"
     total = len(bugs.split(";"))
     for bug in bugs.split(";"):
         tries = 0
         current += 1
         check(bug)
-    for i in cleans:
-        cr = re.sub(i + r"\n", "", cr)
-    with open("bugs.txt", "w") as f:
-        f.write(cr.strip())
 print()
 if level & l_edit:
     current = 0
