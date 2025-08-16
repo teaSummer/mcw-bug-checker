@@ -35,7 +35,11 @@ l_check = 0b0010  # 检查bug模板
 l_edit = 0b0100  # 编辑wiki条目
 
 
-site = Site(f"{lang + '.' if lang != 'en' else ''}minecraft.wiki", path="/")
+site = Site(
+    f"{lang + '.' if lang != 'en' else ''}minecraft.wiki",
+    path="/",
+    clients_useragent="TeaEvebot/1.0 (dxlls520@gmail.com)",
+)
 if level & l_edit:
     bot_password = os.getenv("BOT_PASSWORD")
     owner_password = os.getenv("OWNER_PASSWORD")
