@@ -391,7 +391,7 @@ if level & l_edit:
                 if dup_res:
                     dup_res = "|" + dup_res["name"]
                 g2 = re.sub(
-                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.+?)\|(.+?)\|.+?}}",
+                    r"\{\{[Bb]ug\|[A-Za-z0-9-]+\|(.*?)\|(.*?)\|.*?}}",
                     "{{" + f"bug|{dup}|\\1|\\2{dup_res or ""}",
                     g2,
                 )
