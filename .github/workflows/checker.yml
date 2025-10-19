@@ -14,8 +14,9 @@ jobs:
       - name: Day of the month
         id: check
         run: |
-          day=$(expr $(date +%d) + 0)
+          day=$(date +%-d)
           pass=0
+          echo "Today is Day $day of the month."
           if [[ $day > 7 && $day < 15 ]]; then
             pass=1
           elif [[ ${{ github.event_name }} == workflow_dispatch ]]; then
@@ -26,7 +27,7 @@ jobs:
   checker:
     runs-on: ubuntu-latest
     needs: condition
-    if: needs.condition.outputs.pass > 0
+    if: needs.condition.outputs.pass != 0
     env:
       BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
       OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}
