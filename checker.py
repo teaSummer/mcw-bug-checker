@@ -68,6 +68,10 @@ for ns in nsl:
         pages.append(page.get("title"))
 pages = sorted(list(set(pages)))
 
+sdjira_email = os.getenv("SDJIRA_EMAIL")
+sdjira_password = os.getenv("SDJIRA_PASSWORD")
+sdjira_cookies = None
+
 try:
     os.remove("data.txt")
     os.remove("bugs.txt")
@@ -109,29 +113,90 @@ def get_logger(level=logging.INFO, prefix=True):
 
 def mojira(bug, legacy_mode=False):
     def legacy(bug):
-        r = requests.get(
-            f"https://bugs-legacy.mojang.com/rest/api/2/search?jql=issue%20%3D%20{bug}"
-        ).text.strip()
-        return json.loads(r)
+        response = requests.get(
+            f"https://bugs-legacy.mojang.com/rest/api/2/issue/{bug}",
+            headers={"Content-Type": "application/json"},
+        )
+        return response.json()
+
+    def public(bug):
+        response = requests.post(
+            "https://bugs.mojang.com/api/jql-search-post",
+            data=json.dumps(
+                {
+                    "advanced": True,
+                    "project": bug.split("-", 1)[0],
+                    "search": "key = " + bug,
+                    "maxResults": 1,
+                }
+            ),
+            headers={"Content-Type": "application/json"},
+        )
+        return response.json()["issues"][0]
+
+    def servicedesk(bug):
+        def authenticate():
+            response = requests.post(
+                "https://report.bugs.mojang.com/jsd-login/v1/authentication/authenticate",
+                data=json.dumps(
+                    {
+                        "email": sdjira_email,
+                        "password": sdjira_password,
+                    }
+                ),
+                headers={"Content-Type": "application/json"},
+            )
+            assert response.cookies
+            return response.cookies
+
+        global sdjira_cookies
+        if not sdjira_cookies:
+            sdjira_cookies = authenticate()
+        portals = {
+            "MC": 2,
+            "MCPE": 6,
+            "MCL": 7,
+            "REALMS": 9,
+            "WEB": 10,
+            "BDS": 4,
+        }
+        portal = portals[bug.split("-")[0]]
+        response = requests.post(
+            "https://report.bugs.mojang.com/rest/servicedesk/1/customer/models",
+            data=json.dumps(
+                {
+                    "models": ["reqDetails"],
+                    "options": {
+                        "reqDetails": {
+                            "key": bug,
+                            "portalId": portal,
+                        },
+                        "portalId": portal,
+                    },
+                }
+            ),
+            headers={"Content-Type": "application/json"},
+            cookies=sdjira_cookies,
+        )
+        if response.status_code == 403:
+            sdjira_cookies = authenticate()
+            assert False
+        issue = response.json()["reqDetails"]["issue"]
+        resolution = {"fields": {}}
+        if "resolution" in issue:
+            resolution["fields"]["resolution"] = {"name": issue["resolution"]}
+        assert issue["resolution"] != "Duplicate"
+        return resolution
 
     if legacy_mode:
         return legacy(bug)
-    r = requests.post(
-        "https://bugs.mojang.com/api/jql-search-post",
-        data=json.dumps(
-            {
-                "advanced": True,
-                "project": bug.split("-", 1)[0],
-                "search": "key = " + bug,
-                "maxResults": 1,
-            }
-        ),
-        headers={"Content-Type": "application/json"},
-    ).text.strip()
-    return json.loads(r)
+    try:
+        return servicedesk(bug)
+    except:
+        return public(bug)
 
 
-def wiki(page, isredirect=False):
+def wiki(page, is_redirect=False):
     def uppercase(match):
         return match.group(0).upper()
 
@@ -195,12 +260,12 @@ def wiki(page, isredirect=False):
                     f"^{l}:", "", page
                 )
                 page = f"https://{page}"
-                raise NameError
+                assert False
             if r == "":
                 raise SyntaxError
             logger.info(f"({current}/{total}) {shorten(page)}")
         else:
-            if isredirect:
+            if is_redirect:
                 pass
             logger.error(f"({current}/{total}) Invalid wiki page")
             return
@@ -249,10 +314,10 @@ def wiki(page, isredirect=False):
         with open("bugs.txt", "a") as f:
             f.write(bugs)
     except Exception as err:
-        if type(err) == NameError:
+        if type(err) == AssertionError:
             page = page.replace(" ", "_")
             logger.warning(f"Redirecting {shorten(page_backup)} to {shorten(page)}")
-            wiki(page, isredirect=True)
+            wiki(page, is_redirect=True)
         else:
             tries += 1
             logger.warning(f"Retrying {shorten(page)} - {tries}/{max_tries}")
@@ -279,10 +344,10 @@ def check(bug):
             "SC",
         ]:
             tries = max_tries
-            raise NameError
+            assert False
         r = mojira(bug)
-        if r["issues"][0]["fields"]["resolution"]:
-            status = "|||" + r["issues"][0]["fields"]["resolution"]["name"]
+        if r["fields"]["resolution"]:
+            status = "|||" + r["fields"]["resolution"]["name"]
             status = status.replace("Won&#39;t Fix", "Won't Fix").replace(
                 "Works As Intended", "WAI"
             )
@@ -296,7 +361,7 @@ def check(bug):
                 f.write("{{bug|" + bug + "}}\n")
             logger.info(f"({current}/{total}) " + "{{bug|" + bug + "}}")
     except Exception as err:
-        if type(err) != NameError:
+        if type(err) != AssertionError:
             logger.warning(f"Retrying {bug} - {tries+1}/{max_tries}")
         tries += 1
         if tries >= max_tries:
@@ -386,8 +451,8 @@ if level & l_edit:
         if g2.find("Duplicate") != -1:
             dup = mojira(ref[2].strip())
             try:
-                dup = dup["issues"][0]["fields"]["issuelinks"][0]["outwardIssue"]["key"]
-                dup_res = mojira(dup)["issues"][0]["fields"]["resolution"]
+                dup = dup["fields"]["issuelinks"][0]["outwardIssue"]["key"]
+                dup_res = mojira(dup)["fields"]["resolution"]
                 if dup_res:
                     dup_res = "|" + dup_res["name"]
                 g2 = re.sub(

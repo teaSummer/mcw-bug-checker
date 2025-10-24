@@ -31,6 +31,8 @@ jobs:
     env:
       BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
       OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}
+      SDJIRA_EMAIL: ${{ secrets.SDJIRA_EMAIL }}
+      SDJIRA_PASSWORD: ${{ secrets.SDJIRA_PASSWORD }}
     steps:
       - uses: actions/checkout@main
       - name: Set up Python
