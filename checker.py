@@ -17,6 +17,7 @@ def I(string):
 # 配置
 lang = "zh"  # lang = "en"
 max_tries = 3  # 最大重试次数
+page_size = 100  # 每页/次请求的最大bug数
 level = 0b0111  # 全自动
 nsl = [
     0,
@@ -68,6 +69,14 @@ for ns in nsl:
         pages.append(page.get("title"))
 pages = sorted(list(set(pages)))
 
+portals = {
+    "MC": 2,
+    "MCPE": 6,
+    "MCL": 7,
+    "REALMS": 9,
+    "WEB": 10,
+    "BDS": 4,
+}
 sdjira_email = os.getenv("SDJIRA_EMAIL")
 sdjira_password = os.getenv("SDJIRA_PASSWORD")
 sdjira_cookies = None
@@ -111,7 +120,7 @@ def get_logger(level=logging.INFO, prefix=True):
     return logger
 
 
-def mojira(bug, legacy_mode=False):
+def mojira(project, bugs, legacy_mode=False, tries=0):
     def legacy(bug):
         response = requests.get(
             f"https://bugs-legacy.mojang.com/rest/api/2/issue/{bug}",
@@ -119,20 +128,20 @@ def mojira(bug, legacy_mode=False):
         )
         return response.json()
 
-    def public(bug):
+    def public(bugs):
         response = requests.post(
             "https://bugs.mojang.com/api/jql-search-post",
             data=json.dumps(
                 {
                     "advanced": True,
-                    "project": bug.split("-", 1)[0],
-                    "search": "key = " + bug,
-                    "maxResults": 1,
+                    "project": project,
+                    "search": f"key in ({",".join(bugs)})",
+                    "maxResults": page_size,
                 }
             ),
             headers={"Content-Type": "application/json"},
         )
-        return response.json()["issues"][0]
+        return response.json()["issues"]
 
     def servicedesk(bug):
         def authenticate():
@@ -152,14 +161,6 @@ def mojira(bug, legacy_mode=False):
         global sdjira_cookies
         if not sdjira_cookies:
             sdjira_cookies = authenticate()
-        portals = {
-            "MC": 2,
-            "MCPE": 6,
-            "MCL": 7,
-            "REALMS": 9,
-            "WEB": 10,
-            "BDS": 4,
-        }
         portal = portals[bug.split("-")[0]]
         response = requests.post(
             "https://report.bugs.mojang.com/rest/servicedesk/1/customer/models",
@@ -189,11 +190,19 @@ def mojira(bug, legacy_mode=False):
         return resolution
 
     if legacy_mode:
-        return legacy(bug)
+        return [legacy(bug) for bug in bugs]
     try:
-        return servicedesk(bug)
+        return public(bugs)
     except:
-        return public(bug)
+        if tries >= max_tries:
+            logger.warning(
+                f"Occured when processing {len(bugs)} of {project}, now in single mode"
+            )
+            return [servicedesk(bug) for bug in bugs]
+        logger.warning(
+            f"Retrying {len(bugs)} of {project} - {tries+1}/{max_tries}"
+        )
+        return mojira(project, bugs, tries=tries + 1)
 
 
 def wiki(page, is_redirect=False):
@@ -329,45 +338,42 @@ def wiki(page, is_redirect=False):
                 wiki(page)
 
 
-def check(bug):
-    global tries
-    bug = bug.strip()
+def check(project, bugs):
+    global current, tries
     try:
-        if bug.split("-")[0] in [
-            "ARCHMCPE",
-            "MCAPI",
-            "MCCE",
-            "MCD",
-            "MCDS",
-            "MCE",
-            "MCLG",
-            "SC",
-        ]:
+        key = project
+        if project not in portals.keys():
             tries = max_tries
+            current += len(bugs)
             assert False
-        r = mojira(bug)
-        if r["fields"]["resolution"]:
-            status = "|||" + r["fields"]["resolution"]["name"]
-            status = status.replace("Won&#39;t Fix", "Won't Fix").replace(
-                "Works As Intended", "WAI"
-            )
-            if status == "|||Unresolved":
-                status = ""
-            with open("data.txt", "a") as f:
-                f.write("{{bug|" + bug + status + "}}\n")
-            logger.info(f"({current}/{total}) " + "{{bug|" + bug + status + "}}")
-        else:
-            with open("data.txt", "a") as f:
-                f.write("{{bug|" + bug + "}}\n")
-            logger.info(f"({current}/{total}) " + "{{bug|" + bug + "}}")
+        t = ""
+        r = mojira(project, bugs)
+        for bug in r:
+            current += 1
+            key = bug["key"]
+            if bug["fields"]["resolution"]:
+                status = "|||" + bug["fields"]["resolution"]["name"]
+                status = status.replace("Won&#39;t Fix", "Won't Fix").replace(
+                    "Works As Intended", "WAI"
+                )
+                if status == "|||Unresolved":
+                    status = ""
+                t += "{{bug|" + key + status + "}}\n"
+                logger.info(f"({current}/{total}) " + "{{bug|" + key + status + "}}")
+            else:
+                t += "{{bug|" + key + "}}\n"
+                logger.info(f"({current}/{total}) " + "{{bug|" + key + "}}")
+        with open("data.txt", "a") as f:
+            f.write(t)
     except Exception as err:
         if type(err) != AssertionError:
-            logger.warning(f"Retrying {bug} - {tries+1}/{max_tries}")
+            logger.warning(f"Retrying {key} - {tries+1}/{max_tries}")
+            current = last
         tries += 1
         if tries >= max_tries:
-            logger.error(f"({current}/{total}) Occured when processing {bug}")
+            logger.error(f"({current}/{total}) Occured when processing {key}")
         else:
-            check(bug)
+            check(project, bugs)
 
 
 logger = get_logger()
@@ -387,14 +393,23 @@ if level & l_wiki:
     os.remove("cache.txt")
 print()
 if level & l_check:
-    current = 0
+    current = last = 0
     with open("bugs.txt") as f:
         bugs = ";".join(f.read().strip().split())
     total = len(bugs.split(";"))
+    projects = {}
     for bug in bugs.split(";"):
-        tries = 0
-        current += 1
-        check(bug)
+        p = bug.split("-")[0]
+        if p not in projects:
+            projects[p] = [[]]
+        if len(projects[p][-1]) >= page_size:
+            projects[p].append([])
+        projects[p][-1].append(bug.strip())
+    for project, total_bugs in projects.items():
+        for bugs in total_bugs:
+            tries = 0
+            check(project, bugs)
+            last = current
 print()
 if level & l_edit:
     current = 0
@@ -417,12 +432,12 @@ if level & l_edit:
         g1 = "{{bug|" + f"{ref[2].strip()}|{g1 if g1 else ''}"
         g2 = g1
 
-        # before
+        # BEFORE
         before = re.search(pattern, ref[4].strip())
         if before:
             g1 += before[0].replace("res=", "")
         g1 = g1.removesuffix("|") + "}}"
-        # now
+        # NOW
         now = re.search(r"bug\|" + ref[2].strip() + r"(\|\|\|[^|}]+)?}}", r, re.I)
         if not now:
             t = (
@@ -449,10 +464,10 @@ if level & l_edit:
             g2,
         )
         if g2.find("Duplicate") != -1:
-            dup = mojira(ref[2].strip())
+            dup = mojira(ref[2].split("-")[0], [ref[2].strip()])[0]
             try:
                 dup = dup["fields"]["issuelinks"][0]["outwardIssue"]["key"]
-                dup_res = mojira(dup)["fields"]["resolution"]
+                dup_res = mojira(dup.split("-")[0], [dup])[0]["fields"]["resolution"]
                 if dup_res:
                     dup_res = "|" + dup_res["name"]
                 g2 = re.sub(

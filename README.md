@@ -10,4 +10,5 @@ A project to automatically check for resolutions of `{{bug}}` templates in Minec
 * lang: Chinese (`zh`)
 * level: Full-automatic (`0b0111`)
 * max_tries: `3`
+* page_size: `100`
 * namespaces: Default (`[0, 9994, 9996, 9998, 10000, 10002, 10004, 10006, 10010]`)
