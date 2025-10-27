@@ -586,7 +586,7 @@ if level & l_edit:
         .replace("}}", "</option>")
     )
     hole_version = f"""
-<choose uncached>
+<choose {{{{#if:{{{{{{uncached|}}}}}}|uncached|}}}}>
 {hole_bugs}
 <choicetemplate>User:TeaSummer/Bug|hole=1</choicetemplate>
 </choose><noinclude>{{{{documentation}}}}
