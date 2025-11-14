@@ -55,7 +55,7 @@ for ns in nsl:
     for page in site.search(
         " -".join(
             [
-                r'insource:/\<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+?)(\|[^\<]+?}}\<\/ref>|}}\<\/ref>)|\<ref( *name=".*?")? *>\{\{bug\|[^{}]+\|(title|text|res)=[^}]+?}}\<\/ref>|\<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(\<\/code>|[^\<])+?}}\<\/ref>/',
+                r'insource:/\<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+?)(\|[^\<]+?}}\<\/ref>|}}\<\/ref>)|\<ref( *name=".*?")? *>\{\{bug\|[^{}]+\|(res|text|title|[2-4])=[^}]+?}}\<\/ref>|\<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(\<\/code>|[^\<])+?}}\<\/ref>/',
                 r'intitle:"*前"',
                 r"intitle:/[^洋]（旧版）/",
                 r'hastemplate:"Joke_feature"',
@@ -313,7 +313,7 @@ def wiki(page, is_redirect=False):
             if ref1[0].find("#") == -1:
                 bugs += f"{bug.strip()}\n"
         for ref1 in re.findall(
-            r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title)=[^}]+?}}</ref>)',
+            r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title|[2-4])=[^}]+?}}</ref>)',
             r,
             re.I,
         ):
@@ -415,7 +415,7 @@ if level & l_edit:
     current = 0
     edittotal = total = len(pages)
     status = I(
-        "(AR|CR|WAI|WD|WF|Won'?t Fix|Works As Intended|Fixed|Cannot Reproduce|Awaiting Response|Duplicate|Incomplete|Invalid|Resolved|Unresolved|Won'?t Do|Done|已修复|不予修复)"
+        "(Won'?t Fix|Works As Intended|Fixed|Cannot Reproduce|Awaiting Response|Duplicate|Incomplete|Invalid|Resolved|Unresolved|Won'?t Do|Done|未修复|已修复|不予修复|重复报告|报告不完整|有意为之|无法复现|无效|等待回应|AR|CR|F|INC|INV|U|WAI|WF|D|CNR|WD)"
     )
     pattern = r"\|\|?{s}|res={s}".format(s=status)
     with open("data.txt") as f:
@@ -536,14 +536,14 @@ if level & l_edit:
             if ref1[0].find("#") == -1 and ref1[0].find("|archive=") == -1:
                 t = t.replace(z, ref1[0])
         for ref1 in re.findall(
-            r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title)=[^}]+?}}</ref>)',
+            r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title|[2-4])=[^}]+?}}</ref>)',
             t,
             re.I,
         ):
             r_res, r_text, r_title = (
-                re.search(r"\|res=([^|}]+)", ref1[0], re.I),
-                re.search(r"\|text=([^|}]+)", ref1[0], re.I),
-                re.search(r"\|title=([^|}]+)", ref1[0], re.I),
+                re.search(r"\|res=([^|}]+)", ref1[0], re.I) or re.search(r"\|4=([^|}]+)", ref1[0], re.I),
+                re.search(r"\|text=([^|}]+)", ref1[0], re.I) or re.search(r"\|2=([^|}]+)", ref1[0], re.I),
+                re.search(r"\|title=([^|}]+)", ref1[0], re.I) or re.search(r"\|3=([^|}]+)", ref1[0], re.I),
             )
             if r_res:
                 r_res = r_res.group(1)
