@@ -17,7 +17,7 @@ jobs:
           day=$(date +%-d)
           pass=0
           echo "Today is Day $day of the month."
-          if [[ $day > 7 && $day < 15 ]]; then
+          if [[ $day -gt 7 && $day -lt 15 ]]; then
             pass=1
           elif [[ ${{ github.event_name }} == workflow_dispatch ]]; then
             pass=2
