@@ -19,15 +19,16 @@ jobs:
           echo "Today is Day $day of the month."
           if [[ $day -gt 7 && $day -lt 15 ]]; then
             pass=1
-          elif [[ ${{ github.event_name }} == workflow_dispatch ]]; then
-            pass=2
+          fi
+          if [ ${{ github.event_name }} == workflow_dispatch ]; then
+            pass=0
           fi
           echo "pass=$pass" >> $GITHUB_OUTPUT
 
   checker:
     runs-on: ubuntu-latest
     needs: condition
-    if: needs.condition.outputs.pass != 0
+    if: needs.condition.outputs.pass == 0
     env:
       BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
       OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}

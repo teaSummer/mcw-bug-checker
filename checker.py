@@ -417,7 +417,7 @@ if level & l_edit:
     status_pattern = I(
         "(Won'?t Fix|Works As Intended|Fixed|Cannot Reproduce|Awaiting Response|Duplicate|Incomplete|Invalid|Resolved|Unresolved|Won'?t Do|Done|未修复|已修复|不予修复|重复报告|报告不完整|有意为之|无法复现|无效|等待回应|AR|CR|F|INC|INV|U|WAI|WF|D|CNR|WD)"
     )
-    pattern = r"\|\|?{s}|res={s}[|}]".format(s=status_pattern)
+    pattern = r"\|\|?{s}|res={s}[|}}]".format(s=status_pattern)
     with open("data.txt") as f:
         r = f.read()
     start = 1  # 从第N个页面开始编辑
