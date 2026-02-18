@@ -2,7 +2,7 @@ name: Bug checker
 
 on:
   schedule:
-    - cron: '0 16 * * 6'
+    - cron: 0 16 * * 6
   workflow_dispatch:
 
 jobs:
@@ -30,25 +30,25 @@ jobs:
     needs: condition
     if: needs.condition.outputs.pass == 0
     env:
-      BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
-      OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}
+      WIKI_BOT_PASSWORD: ${{ secrets.WIKI_BOT_PASSWORD }}
       SDJIRA_EMAIL: ${{ secrets.SDJIRA_EMAIL }}
       SDJIRA_PASSWORD: ${{ secrets.SDJIRA_PASSWORD }}
+      CURRENT_DATE: ""
     steps:
-      - uses: actions/checkout@main
-      - name: Set up Python
-        uses: actions/setup-python@main
+      - uses: actions/checkout@v6
+      - name: Set up Python and uv
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: 3.13
+          python-version: 3.12
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          uv sync
       - name: Check bug templates
         run: |
-          python checker.py
+          uv run checker.py
           echo "CURRENT_DATE=$(date '+%Y-%m-%d UTC')" >> $GITHUB_ENV
       - name: Commit & Push
-        uses: EndBug/add-and-commit@main
+        uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
-          message: "Update ${{env.CURRENT_DATE}}"
+          message: Update ${{ env.CURRENT_DATE }}

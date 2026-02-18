@@ -1,0 +1,81 @@
+{
+  "wiki_useragent": "TeaEvebot/1.0 (dxlls520@gmail.com)",
+  "wiki_bot_username": "TeaEvebot",
+  "wiki_bot_password": "",
+  "sdjira_account_email": "",
+  "sdjira_account_password": "",
+  "sites": {
+    "en": {
+      "enabled": false,
+      "namespaces": [
+        0
+      ],
+      "record_bug_hole": false,
+      "search_exclusives": [
+        "hastemplate:Joke_feature",
+        "hastemplate:April_Fools"
+      ]
+    },
+    "zh": {
+      "enabled": true,
+      "namespaces": [
+        0,
+        9994,
+        9996,
+        9998,
+        10000,
+        10002,
+        10004,
+        10006,
+        10010
+      ],
+      "record_bug_hole": "User:TeaSummer/A Bug's Life",
+      "search_exclusives": [
+        "intitle:*前",
+        "intitle:/[^洋]（旧版）/",
+        "hastemplate:Joke_feature",
+        "hastemplate:April_Fools"
+      ]
+    }
+  },
+  "sdjira_portals": {
+    "MC": 2,
+    "MCPE": 6,
+    "MCL": 7,
+    "REALMS": 9,
+    "WEB": 10,
+    "BDS": 4
+  },
+  "locales": {
+    "en": {
+      "summary.bot": "Bot: {}",
+      "summary.human": "{}",
+      "summary.message.edit": "Check {{{{[[Template:Bug|bug]]}}}} templates",
+      "summary.message.edit.hole_page": "Update data for A Bug's Life",
+      "log.info": "({}/{}) {}",
+      "log.info.start": "Start checking templates on {}-wiki.",
+      "log.warning.skip": "Unenabled; skipped.",
+      "log.warning.retry": "Retrying {} - Attempt {}/{}",
+      "log.warning.redirect_to": "{} is a redirection, need to get its destination {}.",
+      "log.error": "({}/{}) Error occurred when processing {}.",
+      "log.error.bot_config": "Bot username or password is not set.",
+      "log.error.no_wiki_page": "({}/{}) Invalid wiki page.",
+      "log.error.switch_to_single": "Error occurred when processing {} of project {}, switched to single-requesting mode."
+    },
+    "zh": {
+      "summary.bot": "机器人：{}",
+      "summary.human": "{}",
+      "summary.message.edit": "检查{{{{[[Template:Bug|bug]]}}}}模板",
+      "summary.message.edit.hole_page": "更新虫虫危机数据",
+      "log.info": "（{}/{}）{}",
+      "log.info.start": "开始检查 {}-wiki 上的模板。",
+      "log.warning.skip": "未启用，已跳过。",
+      "log.warning.retry": "正在重试 {} - 第{}/{}次尝试",
+      "log.warning.redirect_to": "{} 属于重定向，需要获取其目标 {}。",
+      "log.error": "（{}/{}）处理 {} 时发生错误。",
+      "log.error.bot_config": "未配置机器人用户名或密码。",
+      "log.error.no_wiki_page": "（{}/{}）无效的wiki页面。",
+      "log.error.switch_to_single": "处理 {} 项目中的 {} 时发生错误，已切换为单请求模式。"
+    }
+  }
+}
