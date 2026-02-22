@@ -15,10 +15,10 @@ jobs:
         id: check
         run: |
           day=$(date +%-d)
-          pass=0
+          pass=1
           echo "Today is Day $day of the month."
           if [[ $day -gt 7 && $day -lt 15 ]]; then
-            pass=1
+            pass=0
           fi
           if [ ${{ github.event_name }} == workflow_dispatch ]; then
             pass=0

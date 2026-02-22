@@ -108,7 +108,7 @@ def I(string: str) -> str:
 
 def mojira(
     project: str, bugs: Iterable[str], legacy_mode: bool = False, tries: int = 0
-):
+) -> list[dict]:
     def legacy(bug: str) -> dict:
         response = requests.get(
             f"https://bugs-legacy.mojang.com/rest/api/2/issue/{bug}",
@@ -185,19 +185,20 @@ def mojira(
         return mojira(project, bugs, tries=tries + 1)
 
 
-def main(lang):
+def main(lang: _Lang) -> None:
     site = Site(
         f"{lang + '.' if lang != 'en' else ''}minecraft.wiki",
         path="/",
         clients_useragent=config.wiki_useragent,
     )
     logger = get_logger()
-    if config.sites[lang].edit_wiki:
+    if config.sites[lang].edit_wiki or config.sites[lang].record_bug_hole:
         bot_password = config.wiki_bot_password or os.getenv("WIKI_BOT_PASSWORD")
         if not config.wiki_bot_username or not bot_password:
             raise ValueError(locale(lang, "log.error.bot_config"))
         # site.clientlogin(username="", password="")
         site.clientlogin(username=config.wiki_bot_username, password=bot_password)
+        site.site_init()
         isbot = site.username.lower().endswith("bot")
     pages = []
     nsl = config.sites[lang].namespaces
@@ -571,11 +572,11 @@ def main(lang):
             .replace("}}", "</option>")
         )
         hole_version = f"""
-    <choose {{{{#if:{{{{{{uncached|}}}}}}|uncached|}}}}>
-    {hole_bugs}
-    <choicetemplate>User:TeaSummer/Bug|hole=1</choicetemplate>
-    </choose><noinclude>{{{{documentation}}}}
-    </noinclude>
+<choose {{{{#if:{{{{{{uncached|}}}}}}|uncached|}}}}>
+{hole_bugs}
+<choicetemplate>User:TeaSummer/Bug|hole=1</choicetemplate>
+</choose><noinclude>{{{{documentation}}}}
+</noinclude>
         """.strip()
         hole_page.edit(
             hole_version,
