@@ -55,7 +55,7 @@ class Config:
     wiki_bot_password: str | None = None
     sdjira_account_email: str | None = None
     sdjira_account_password: str | None = None
-    bugs_size_per_chunk: int = 200
+    bugs_size_per_chunk: int = 100
     save_for: _SaveFor = field(default_factory=_SaveFor)
     max_tries: int = 5
 
@@ -290,7 +290,7 @@ def main(lang: _Lang) -> None:
                 )
                 return wiki(page_title)
             else:
-                tries += 1
+                tries = tries + 1
                 logger.warning(
                     locale(lang, "log.warning.retry", page_title, tries, max_tries)
                 )
@@ -305,12 +305,12 @@ def main(lang: _Lang) -> None:
             key = project
             if project not in config.sdjira_portals.keys():
                 tries = max_tries
-                current += len(bugs)
+                current = current + len(bugs)
                 assert False
             t = []
             r = mojira(project, bugs)
             for bug in r:
-                current += 1
+                current = current + 1
                 key = bug["key"]
                 status = None
                 if (
@@ -344,7 +344,7 @@ def main(lang: _Lang) -> None:
                     locale(lang, "log.warning.retry", key, tries + 1, max_tries)
                 )
                 current = last
-            tries += 1
+            tries = tries + 1
             if tries >= max_tries:
                 logger.error(locale(lang, "log.error", current, total, key))
                 return []
@@ -357,7 +357,7 @@ def main(lang: _Lang) -> None:
         bugs = []
         for page in pages:
             tries = 0
-            current += 1
+            current = current + 1
             bugs.extend(wiki(page))
         bugs_file.write_text("\n".join(sorted(list(set(bugs)))))
     print()
@@ -382,9 +382,9 @@ def main(lang: _Lang) -> None:
         data_write = ""
         for bug in bug_data:
             if bug[1] is None:
-                data_write += "{{bug|" + bug[0] + "}}\n"
+                data_write = data_write + "{{bug|" + bug[0] + "}}\n"
                 continue
-            data_write += "{{bug|" + bug[0] + "|||" + bug[1] + "}}\n"
+            data_write = data_write + "{{bug|" + bug[0] + "|||" + bug[1] + "}}\n"
         bug_data_file.write_text(data_write.strip())
     print()
     if config.sites[lang].edit_wiki:
@@ -409,7 +409,7 @@ def main(lang: _Lang) -> None:
             # BEFORE
             before = re.search(pattern, ref[4].strip())
             if before:
-                g1 += before[0].replace("res=", "")
+                g1 = g1 + before[0].replace("res=", "")
             g1 = g1.strip("|") + "}}"
             # NOW
             now = re.search(r"bug\|" + ref[2].strip() + r"(\|\|\|[^|}]+)?}}", r, re.I)
@@ -423,9 +423,9 @@ def main(lang: _Lang) -> None:
                 )
                 return
             if g2.endswith("|"):
-                g2 += "|"
+                g2 = g2 + "|"
             if now and now[1]:
-                g2 += "|" + now[1].removeprefix("|||")
+                g2 = g2 + "|" + now[1].removeprefix("|||")
             g2 = g2.strip("|") + "}}"
             if g2.count("|") == 3 and g2.find("||") == -1:
                 g2 = g2.replace("|", "||").replace(
@@ -482,7 +482,7 @@ def main(lang: _Lang) -> None:
 
         for page in pages[start - 1 : max_page]:
             tries = 0
-            current += 1
+            current = current + 1
             logger = get_logger()
             _page = site.pages[page]
             t = _page.text()
