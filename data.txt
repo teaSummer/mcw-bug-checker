@@ -1,5 +1,4 @@
 {{bug|BDS-19375|||WAI}}
-{{bug|MC-124113|||Fixed}}
 {{bug|MC-124024|||Fixed}}
 {{bug|MC-123742|||Fixed}}
 {{bug|MC-123619}}
@@ -35,6 +34,7 @@
 {{bug|MC-117609}}
 {{bug|MC-116922}}
 {{bug|MC-116293|||Fixed}}
+{{bug|MC-115812|||Fixed}}
 {{bug|MC-115509|||WAI}}
 {{bug|MC-115092}}
 {{bug|MC-114900|||WAI}}
@@ -99,7 +99,6 @@
 {{bug|MC-1133|||Fixed}}
 {{bug|MC-1127|||WAI}}
 {{bug|MC-108|||WAI}}
-{{bug|MC-134920}}
 {{bug|MC-134900|||Fixed}}
 {{bug|MC-134408}}
 {{bug|MC-134162|||Fixed}}
@@ -195,6 +194,7 @@
 {{bug|MC-124331|||Fixed}}
 {{bug|MC-124295}}
 {{bug|MC-124190|||Invalid}}
+{{bug|MC-124113|||Fixed}}
 {{bug|MC-13246|||Fixed}}
 {{bug|MC-12959|||Fixed}}
 {{bug|MC-1332|||Fixed}}
@@ -226,7 +226,6 @@
 {{bug|MC-147895}}
 {{bug|MC-147711|||Fixed}}
 {{bug|MC-147694}}
-{{bug|MC-147679}}
 {{bug|MC-147591|||Fixed}}
 {{bug|MC-147549|||Fixed}}
 {{bug|MC-147444|||WAI}}
@@ -290,6 +289,7 @@
 {{bug|MC-135868}}
 {{bug|MC-135783}}
 {{bug|MC-135385|||Fixed}}
+{{bug|MC-134920}}
 {{bug|MC-15224}}
 {{bug|MC-14800|||Fixed}}
 {{bug|MC-13738|||Fixed}}
@@ -299,10 +299,10 @@
 {{bug|MC-1390|||Fixed}}
 {{bug|MC-15|||Fixed}}
 {{bug|MC-14}}
-{{bug|MC-169523|||Fixed}}
-{{bug|MC-169265}}
+{{bug|MC-169167}}
 {{bug|MC-168772|||Fixed}}
 {{bug|MC-168716}}
+{{bug|MC-167989|||Fixed}}
 {{bug|MC-167971|||Fixed}}
 {{bug|MC-167421|||Fixed}}
 {{bug|MC-167370|||Invalid}}
@@ -399,8 +399,6 @@
 {{bug|MC-1644|||WAI}}
 {{bug|MC-1635|||Fixed}}
 {{bug|MC-164|||WAI}}
-{{bug|MC-187449|||Fixed}}
-{{bug|MC-187358|||Fixed}}
 {{bug|MC-186797|||Fixed}}
 {{bug|MC-186362|||Fixed}}
 {{bug|MC-185925|||Fixed}}
@@ -493,14 +491,14 @@
 {{bug|MC-170550}}
 {{bug|MC-169684|||WAI}}
 {{bug|MC-169563|||WAI}}
+{{bug|MC-169523|||Fixed}}
+{{bug|MC-169265}}
 {{bug|MC-17999|||Incomplete}}
 {{bug|MC-17827|||Fixed}}
 {{bug|MC-17673|||Fixed}}
 {{bug|MC-1821|||WAI}}
 {{bug|MC-1788}}
 {{bug|MC-1720|||Fixed}}
-{{bug|MC-213794}}
-{{bug|MC-213743|||Fixed}}
 {{bug|MC-213269|||Fixed}}
 {{bug|MC-212976}}
 {{bug|MC-212778|||WAI}}
@@ -595,12 +593,12 @@
 {{bug|MC-187669}}
 {{bug|MC-187664|||Fixed}}
 {{bug|MC-187539|||Fixed}}
+{{bug|MC-187449|||Fixed}}
+{{bug|MC-187358|||Fixed}}
 {{bug|MC-19893|||Fixed}}
 {{bug|MC-2112}}
 {{bug|MC-1981|||Fixed}}
 {{bug|MC-194|||WAI}}
-{{bug|MC-248841|||WAI}}
-{{bug|MC-248588}}
 {{bug|MC-246909}}
 {{bug|MC-243152|||Fixed}}
 {{bug|MC-243124}}
@@ -656,7 +654,7 @@
 {{bug|MC-226683}}
 {{bug|MC-226272}}
 {{bug|MC-226213|||Fixed}}
-{{bug|MC-225355}}
+{{bug|MC-225355|||WAI}}
 {{bug|MC-224960|||Fixed}}
 {{bug|MC-224480|||Fixed}}
 {{bug|MC-224195}}
@@ -694,13 +692,13 @@
 {{bug|MC-214187|||Fixed}}
 {{bug|MC-214186}}
 {{bug|MC-213927|||Fixed}}
+{{bug|MC-213794}}
+{{bug|MC-213743|||Fixed}}
 {{bug|MC-2432|||WAI}}
 {{bug|MC-2310|||Fixed}}
 {{bug|MC-2208|||Fixed}}
 {{bug|MC-2157}}
 {{bug|MC-2153|||Fixed}}
-{{bug|MC-266903|||Fixed}}
-{{bug|MC-266778}}
 {{bug|MC-266723|||Fixed}}
 {{bug|MC-266613}}
 {{bug|MC-266494|||Fixed}}
@@ -793,14 +791,14 @@
 {{bug|MC-249181|||Fixed}}
 {{bug|MC-249115|||Fixed}}
 {{bug|MC-249032|||Fixed}}
+{{bug|MC-248841|||WAI}}
+{{bug|MC-248588}}
 {{bug|MC-25976}}
 {{bug|MC-25378|||Fixed}}
 {{bug|MC-25088|||Fixed}}
 {{bug|MC-2666|||Fixed}}
 {{bug|MC-2604|||Fixed}}
 {{bug|MC-2536|||Awaiting Response}}
-{{bug|MC-270954|||Won't Fix}}
-{{bug|MC-270881}}
 {{bug|MC-270870|||WAI}}
 {{bug|MC-270784|||WAI}}
 {{bug|MC-270706}}
@@ -898,10 +896,9 @@
 {{bug|MC-266991|||Fixed}}
 {{bug|MC-266934|||WAI}}
 {{bug|MC-266932|||Won't Fix}}
+{{bug|MC-266903|||Fixed}}
+{{bug|MC-266778}}
 {{bug|MC-26757|||Fixed}}
-{{bug|MC-277991|||Fixed}}
-{{bug|MC-277967|||Fixed}}
-{{bug|MC-277961|||Fixed}}
 {{bug|MC-277955|||Fixed}}
 {{bug|MC-277929|||Fixed}}
 {{bug|MC-277865|||Fixed}}
@@ -979,6 +976,7 @@
 {{bug|MC-272431}}
 {{bug|MC-272122}}
 {{bug|MC-272105|||Fixed}}
+{{bug|MC-272069}}
 {{bug|MC-272043|||Fixed}}
 {{bug|MC-272004|||Invalid}}
 {{bug|MC-271971|||Fixed}}
@@ -997,13 +995,9 @@
 {{bug|MC-271397}}
 {{bug|MC-271156}}
 {{bug|MC-271109|||Fixed}}
+{{bug|MC-270954|||Won't Fix}}
+{{bug|MC-270881}}
 {{bug|MC-2711|||Fixed}}
-{{bug|MC-305988|||Fixed}}
-{{bug|MC-305580|||Fixed}}
-{{bug|MC-305545|||Fixed}}
-{{bug|MC-305510|||Fixed}}
-{{bug|MC-305507|||Fixed}}
-{{bug|MC-305501|||Fixed}}
 {{bug|MC-305388|||Fixed}}
 {{bug|MC-305292|||Fixed}}
 {{bug|MC-304401|||Fixed}}
@@ -1017,6 +1011,7 @@
 {{bug|MC-302678|||Fixed}}
 {{bug|MC-302672|||Fixed}}
 {{bug|MC-302656|||Fixed}}
+{{bug|MC-302628|||Fixed}}
 {{bug|MC-302593}}
 {{bug|MC-302528|||Fixed}}
 {{bug|MC-302408|||Fixed}}
@@ -1060,6 +1055,7 @@
 {{bug|MC-280241|||Fixed}}
 {{bug|MC-280159|||Fixed}}
 {{bug|MC-280104|||Invalid}}
+{{bug|MC-280008|||WAI}}
 {{bug|MC-279993|||Fixed}}
 {{bug|MC-279967|||Fixed}}
 {{bug|MC-279948|||Fixed}}
@@ -1088,8 +1084,12 @@
 {{bug|MC-278123}}
 {{bug|MC-278115|||Won't Fix}}
 {{bug|MC-278003}}
+{{bug|MC-277991|||Fixed}}
+{{bug|MC-277967|||Fixed}}
+{{bug|MC-277961|||Fixed}}
 {{bug|MC-30527|||Fixed}}
 {{bug|MC-29844|||Fixed}}
+{{bug|MC-29562|||Fixed}}
 {{bug|MC-29463|||Fixed}}
 {{bug|MC-29446|||Fixed}}
 {{bug|MC-29371|||Fixed}}
@@ -1098,7 +1098,9 @@
 {{bug|MC-2871|||Fixed}}
 {{bug|MC-2844|||Fixed}}
 {{bug|MC-2781|||Fixed}}
-{{bug|MC-306837}}
+{{bug|MC-307186}}
+{{bug|MC-306837|||WAI}}
+{{bug|MC-306684|||Won't Fix}}
 {{bug|MC-306682}}
 {{bug|MC-306657|||Fixed}}
 {{bug|MC-306620|||Fixed}}
@@ -1111,14 +1113,12 @@
 {{bug|MC-306022|||Fixed}}
 {{bug|MC-305997|||WAI}}
 {{bug|MC-305989|||Fixed}}
-{{bug|MC-62048|||WAI}}
-{{bug|MC-60634|||Fixed}}
-{{bug|MC-59610|||Fixed}}
-{{bug|MC-58668|||Fixed}}
-{{bug|MC-57992|||Fixed}}
-{{bug|MC-57935|||WAI}}
-{{bug|MC-57884|||Fixed}}
-{{bug|MC-57883|||Fixed}}
+{{bug|MC-305988|||Fixed}}
+{{bug|MC-305580|||Fixed}}
+{{bug|MC-305545|||Fixed}}
+{{bug|MC-305510|||Fixed}}
+{{bug|MC-305507|||Fixed}}
+{{bug|MC-305501|||Fixed}}
 {{bug|MC-57824|||WAI}}
 {{bug|MC-57569|||Fixed}}
 {{bug|MC-57159|||Fixed}}
@@ -1133,6 +1133,7 @@
 {{bug|MC-55382|||Fixed}}
 {{bug|MC-54532|||Fixed}}
 {{bug|MC-54255|||Won't Fix}}
+{{bug|MC-54008|||Fixed}}
 {{bug|MC-53897|||Awaiting Response}}
 {{bug|MC-53641}}
 {{bug|MC-53602|||Fixed}}
@@ -1195,20 +1196,8 @@
 {{bug|MC-528|||WAI}}
 {{bug|MC-506|||Fixed}}
 {{bug|MC-383|||Fixed}}
-{{bug|MC-61|||WAI}}
 {{bug|MC-38|||Fixed}}
 {{bug|MC-4}}
-{{bug|MC-96449|||Fixed}}
-{{bug|MC-95818}}
-{{bug|MC-95612|||Fixed}}
-{{bug|MC-95555|||WAI}}
-{{bug|MC-94831|||Won't Fix}}
-{{bug|MC-94481}}
-{{bug|MC-94413|||Fixed}}
-{{bug|MC-94281|||WAI}}
-{{bug|MC-94094|||Fixed}}
-{{bug|MC-94013|||Fixed}}
-{{bug|MC-93810|||Fixed}}
 {{bug|MC-93685|||Fixed}}
 {{bug|MC-93636|||Fixed}}
 {{bug|MC-93592|||Fixed}}
@@ -1262,6 +1251,7 @@
 {{bug|MC-71530|||Fixed}}
 {{bug|MC-70848|||Fixed}}
 {{bug|MC-70738|||Fixed}}
+{{bug|MC-70317|||WAI}}
 {{bug|MC-70054|||Fixed}}
 {{bug|MC-69865}}
 {{bug|MC-69731|||Won't Fix}}
@@ -1273,12 +1263,21 @@
 {{bug|MC-66247|||Fixed}}
 {{bug|MC-65951|||Fixed}}
 {{bug|MC-65029|||WAI}}
+{{bug|MC-64623|||Fixed}}
 {{bug|MC-64394|||WAI}}
 {{bug|MC-64322|||WAI}}
 {{bug|MC-64087|||Fixed}}
 {{bug|MC-63720|||Fixed}}
 {{bug|MC-63340|||Fixed}}
 {{bug|MC-63333|||Fixed}}
+{{bug|MC-62048|||WAI}}
+{{bug|MC-60634|||Fixed}}
+{{bug|MC-59610|||Fixed}}
+{{bug|MC-58668|||Fixed}}
+{{bug|MC-57992|||Fixed}}
+{{bug|MC-57935|||WAI}}
+{{bug|MC-57884|||Fixed}}
+{{bug|MC-57883|||Fixed}}
 {{bug|MC-8647|||Fixed}}
 {{bug|MC-8509|||Fixed}}
 {{bug|MC-8265}}
@@ -1298,6 +1297,7 @@
 {{bug|MC-902|||Fixed}}
 {{bug|MC-666|||Fixed}}
 {{bug|MC-67|||Fixed}}
+{{bug|MC-61|||WAI}}
 {{bug|MC-99848|||Fixed}}
 {{bug|MC-98995|||Fixed}}
 {{bug|MC-98656|||Fixed}}
@@ -1307,11 +1307,21 @@
 {{bug|MC-97216}}
 {{bug|MC-97201|||Fixed}}
 {{bug|MC-96927|||Fixed}}
+{{bug|MC-96449|||Fixed}}
+{{bug|MC-95818}}
+{{bug|MC-95612|||Fixed}}
+{{bug|MC-95555|||WAI}}
+{{bug|MC-94831|||Won't Fix}}
+{{bug|MC-94481}}
+{{bug|MC-94413|||Fixed}}
+{{bug|MC-94281|||WAI}}
+{{bug|MC-94094|||Fixed}}
+{{bug|MC-94013|||Fixed}}
+{{bug|MC-93810|||Fixed}}
 {{bug|MC-9925|||WAI}}
 {{bug|MC-9856|||Fixed}}
 {{bug|MCL-24661|||Fixed}}
 {{bug|MCL-9589|||Won't Fix}}
-{{bug|MCPE-129479}}
 {{bug|MCPE-129477|||Fixed}}
 {{bug|MCPE-129296}}
 {{bug|MCPE-129262}}
@@ -1333,6 +1343,7 @@
 {{bug|MCPE-127539|||Fixed}}
 {{bug|MCPE-127348}}
 {{bug|MCPE-126942}}
+{{bug|MCPE-126849}}
 {{bug|MCPE-126620|||Fixed}}
 {{bug|MCPE-126197}}
 {{bug|MCPE-125921}}
@@ -1410,7 +1421,6 @@
 {{bug|MCPE-10115|||WAI}}
 {{bug|MCPE-10079|||Fixed}}
 {{bug|MCPE-10077|||Fixed}}
-{{bug|MCPE-152841|||Won't Fix}}
 {{bug|MCPE-152840}}
 {{bug|MCPE-152839}}
 {{bug|MCPE-152838}}
@@ -1504,13 +1514,13 @@
 {{bug|MCPE-129748}}
 {{bug|MCPE-129683|||Won't Fix}}
 {{bug|MCPE-129645}}
+{{bug|MCPE-129479}}
 {{bug|MCPE-15116|||Fixed}}
 {{bug|MCPE-14851|||WAI}}
 {{bug|MCPE-14757|||Fixed}}
 {{bug|MCPE-13804|||Fixed}}
 {{bug|MCPE-13675|||WAI}}
 {{bug|MCPE-1376|||Fixed}}
-{{bug|MCPE-168921|||Fixed}}
 {{bug|MCPE-168869|||Fixed}}
 {{bug|MCPE-168834|||Fixed}}
 {{bug|MCPE-168074}}
@@ -1580,7 +1590,7 @@
 {{bug|MCPE-155739|||Fixed}}
 {{bug|MCPE-155606|||Fixed}}
 {{bug|MCPE-155605|||Fixed}}
-{{bug|MCPE-155044}}
+{{bug|MCPE-155365|||Fixed}}
 {{bug|MCPE-155031|||WAI}}
 {{bug|MCPE-154883|||Cannot Reproduce}}
 {{bug|MCPE-154350}}
@@ -1604,15 +1614,13 @@
 {{bug|MCPE-153135|||Fixed}}
 {{bug|MCPE-152927|||Fixed}}
 {{bug|MCPE-152862}}
+{{bug|MCPE-152841|||Won't Fix}}
 {{bug|MCPE-16221|||Fixed}}
 {{bug|MCPE-16195|||Fixed}}
 {{bug|MCPE-15808|||Won't Fix}}
 {{bug|MCPE-15793}}
 {{bug|MCPE-15632|||Fixed}}
 {{bug|MCPE-15502|||Fixed}}
-{{bug|MCPE-180178}}
-{{bug|MCPE-180164}}
-{{bug|MCPE-180163}}
 {{bug|MCPE-180162}}
 {{bug|MCPE-180109|||Fixed}}
 {{bug|MCPE-179986|||Fixed}}
@@ -1675,7 +1683,6 @@
 {{bug|MCPE-174143|||WAI}}
 {{bug|MCPE-174063}}
 {{bug|MCPE-173865}}
-{{bug|MCPE-173833|||Fixed}}
 {{bug|MCPE-173582|||Fixed}}
 {{bug|MCPE-173569}}
 {{bug|MCPE-173205}}
@@ -1693,8 +1700,11 @@
 {{bug|MCPE-171489|||Fixed}}
 {{bug|MCPE-171456|||Fixed}}
 {{bug|MCPE-171061|||Fixed}}
+{{bug|MCPE-170847|||Won't Fix}}
+{{bug|MCPE-170794|||Won't Fix}}
 {{bug|MCPE-170516|||Fixed}}
 {{bug|MCPE-170484|||Won't Fix}}
+{{bug|MCPE-170427|||Fixed}}
 {{bug|MCPE-169988|||Fixed}}
 {{bug|MCPE-169958|||Fixed}}
 {{bug|MCPE-169777}}
@@ -1707,13 +1717,11 @@
 {{bug|MCPE-169491|||Fixed}}
 {{bug|MCPE-169398}}
 {{bug|MCPE-169038|||Fixed}}
+{{bug|MCPE-168921|||Fixed}}
 {{bug|MCPE-17909|||Won't Fix}}
 {{bug|MCPE-17651}}
 {{bug|MCPE-17|||Fixed}}
-{{bug|MCPE-201604|||Fixed}}
-{{bug|MCPE-201554|||Fixed}}
 {{bug|MCPE-199277|||WAI}}
-{{bug|MCPE-191655|||Fixed}}
 {{bug|MCPE-190751|||Fixed}}
 {{bug|MCPE-190750|||Fixed}}
 {{bug|MCPE-190700|||Fixed}}
@@ -1728,7 +1736,6 @@
 {{bug|MCPE-190253|||Fixed}}
 {{bug|MCPE-190248|||Fixed}}
 {{bug|MCPE-190222|||Fixed}}
-{{bug|MCPE-189928}}
 {{bug|MCPE-189927|||Won't Fix}}
 {{bug|MCPE-189909}}
 {{bug|MCPE-189895|||Fixed}}
@@ -1769,6 +1776,7 @@
 {{bug|MCPE-186686|||Invalid}}
 {{bug|MCPE-186536}}
 {{bug|MCPE-186474}}
+{{bug|MCPE-186418}}
 {{bug|MCPE-186367}}
 {{bug|MCPE-186318}}
 {{bug|MCPE-185829|||Fixed}}
@@ -1806,21 +1814,29 @@
 {{bug|MCPE-180441|||Fixed}}
 {{bug|MCPE-180390|||Fixed}}
 {{bug|MCPE-180180}}
+{{bug|MCPE-180178}}
+{{bug|MCPE-180164}}
+{{bug|MCPE-180163}}
 {{bug|MCPE-19508}}
 {{bug|MCPE-19426|||Fixed}}
 {{bug|MCPE-18880|||Fixed}}
 {{bug|MCPE-19|||Fixed}}
-{{bug|MCPE-237017}}
-{{bug|MCPE-237005}}
+{{bug|MCPE-237825}}
+{{bug|MCPE-237716}}
+{{bug|MCPE-237017|||Fixed}}
+{{bug|MCPE-237005|||Fixed}}
 {{bug|MCPE-236888|||WAI}}
+{{bug|MCPE-236575}}
 {{bug|MCPE-236401|||Fixed}}
 {{bug|MCPE-236381|||WAI}}
+{{bug|MCPE-236161}}
 {{bug|MCPE-235955|||Awaiting Response}}
 {{bug|MCPE-235739|||Fixed}}
 {{bug|MCPE-235423}}
-{{bug|MCPE-234733}}
+{{bug|MCPE-235016}}
+{{bug|MCPE-234733|||Fixed}}
 {{bug|MCPE-234690}}
-{{bug|MCPE-234684}}
+{{bug|MCPE-234684|||Fixed}}
 {{bug|MCPE-233650}}
 {{bug|MCPE-233437|||WAI}}
 {{bug|MCPE-232700|||Fixed}}
@@ -1850,7 +1866,7 @@
 {{bug|MCPE-219937}}
 {{bug|MCPE-219587|||Fixed}}
 {{bug|MCPE-219367|||Fixed}}
-{{bug|MCPE-218741}}
+{{bug|MCPE-218741|||Fixed}}
 {{bug|MCPE-218532}}
 {{bug|MCPE-218079|||Fixed}}
 {{bug|MCPE-217604|||Fixed}}
@@ -1863,13 +1879,8 @@
 {{bug|MCPE-201809|||Fixed}}
 {{bug|MCPE-201679|||Fixed}}
 {{bug|MCPE-201649|||WAI}}
-{{bug|MCPE-34574|||Fixed}}
-{{bug|MCPE-34142}}
-{{bug|MCPE-34025|||WAI}}
-{{bug|MCPE-33892|||Cannot Reproduce}}
-{{bug|MCPE-33440}}
-{{bug|MCPE-33389}}
-{{bug|MCPE-33345|||Won't Fix}}
+{{bug|MCPE-201604|||Fixed}}
+{{bug|MCPE-201554|||Fixed}}
 {{bug|MCPE-33202}}
 {{bug|MCPE-33140}}
 {{bug|MCPE-33124|||WAI}}
@@ -1910,12 +1921,6 @@
 {{bug|MCPE-21304|||Fixed}}
 {{bug|MCPE-20257|||WAI}}
 {{bug|MCPE-2458|||Fixed}}
-{{bug|MCPE-57893}}
-{{bug|MCPE-57038|||WAI}}
-{{bug|MCPE-56926|||Fixed}}
-{{bug|MCPE-56462|||Fixed}}
-{{bug|MCPE-56212|||Fixed}}
-{{bug|MCPE-56142|||Fixed}}
 {{bug|MCPE-55449|||Fixed}}
 {{bug|MCPE-54049}}
 {{bug|MCPE-53881}}
@@ -1961,7 +1966,6 @@
 {{bug|MCPE-46219}}
 {{bug|MCPE-46176}}
 {{bug|MCPE-46152|||Fixed}}
-{{bug|MCPE-46050|||Cannot Reproduce}}
 {{bug|MCPE-46034}}
 {{bug|MCPE-45823}}
 {{bug|MCPE-44464|||WAI}}
@@ -2010,12 +2014,13 @@
 {{bug|MCPE-35306|||Fixed}}
 {{bug|MCPE-35202|||Fixed}}
 {{bug|MCPE-34936|||Fixed}}
-{{bug|MCPE-83536|||WAI}}
-{{bug|MCPE-83420}}
-{{bug|MCPE-83258}}
-{{bug|MCPE-82723|||Incomplete}}
-{{bug|MCPE-82693}}
-{{bug|MCPE-82691}}
+{{bug|MCPE-34574|||Fixed}}
+{{bug|MCPE-34142}}
+{{bug|MCPE-34025|||WAI}}
+{{bug|MCPE-33892|||Cannot Reproduce}}
+{{bug|MCPE-33440}}
+{{bug|MCPE-33389}}
+{{bug|MCPE-33345|||Won't Fix}}
 {{bug|MCPE-82356|||Won't Fix}}
 {{bug|MCPE-82206}}
 {{bug|MCPE-81981|||Fixed}}
@@ -2105,6 +2110,12 @@
 {{bug|MCPE-59502|||Fixed}}
 {{bug|MCPE-59451|||WAI}}
 {{bug|MCPE-59059|||WAI}}
+{{bug|MCPE-57893}}
+{{bug|MCPE-57038|||WAI}}
+{{bug|MCPE-56926|||Fixed}}
+{{bug|MCPE-56462|||Fixed}}
+{{bug|MCPE-56212|||Fixed}}
+{{bug|MCPE-56142|||Fixed}}
 {{bug|MCPE-8101}}
 {{bug|MCPE-7990}}
 {{bug|MCPE-7953|||Fixed}}
@@ -2152,6 +2163,12 @@
 {{bug|MCPE-83909}}
 {{bug|MCPE-83616|||Fixed}}
 {{bug|MCPE-83596}}
+{{bug|MCPE-83536|||WAI}}
+{{bug|MCPE-83420}}
+{{bug|MCPE-83258}}
+{{bug|MCPE-82723|||Incomplete}}
+{{bug|MCPE-82693}}
+{{bug|MCPE-82691}}
 {{bug|MCPE-9338|||Fixed}}
 {{bug|WEB-7048|||Awaiting Response}}
 {{bug|WEB-1246|||Won't Fix}}
