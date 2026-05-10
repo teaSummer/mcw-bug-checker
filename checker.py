@@ -203,7 +203,7 @@ def main(lang: _Lang) -> None:
     pages = []
     nsl = config.sites[lang].namespaces
     conditions = [
-        r'insource:/\<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+?)(\|[^\<]+?}}\<\/ref>|}}\<\/ref>)|\<ref( *name=".*?")? *>\{\{bug\|[^{}]+\|(res|text|title|[2-4])=[^}]+?}}\<\/ref>|\<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(\<\/code>|[^\<])+?}}\<\/ref>/'
+        r'insource:/\<ref( *name=".*?")? *> *\{\{bug\|([A-Za-z0-9-]+?)(\|[^\<]+?}} *\<\/ref>|}} *\<\/ref>)|\<ref( *name=".*?")? *> *\{\{bug\|[^{}]+\|(res|text|title|[2-4])=[^}]+?}} *\<\/ref>|\<ref( *name=".*?")? *> *\{\{bug\|[^}]+?\{(\<\/code>|[^\<])+?}} *\<\/ref>/'
     ]
     conditions.extend(config.sites[lang].search_exclusives)
     for i in range(len(nsl)):
@@ -243,14 +243,14 @@ def main(lang: _Lang) -> None:
                 return []
             bugs = []
             for ref in re.findall(
-                r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)(\|[^<]+?}}</ref>|}}</ref>))',
+                r'(<ref( *name=".*?")? *> *\{\{bug\|([A-Za-z0-9-]+)(\|[^<]+?}} *</ref>|}} *</ref>))',
                 r,
                 re.I,
             ):
                 if ref[0].find("#") == -1:
                     bugs.append(ref[2].strip())
             for ref1 in re.findall(
-                r'(<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(</code>|[^<])+?}}</ref>)',
+                r'(<ref( *name=".*?")? *> *\{\{bug\|[^}]+?\{(</code>|[^<])+?}} *</ref>)',
                 r,
                 re.I,
             ):
@@ -268,14 +268,14 @@ def main(lang: _Lang) -> None:
                     .replace("</code>", "@@@@@N@@@@@")
                 )
                 bug, _ = re.search(
-                    r"\{\{bug\|([A-Za-z0-9-]+)\|([^}]+)}}</ref>",
+                    r"\{\{bug\|([A-Za-z0-9-]+)\|([^}]+)}} *</ref>",
                     ref1[0],
                     re.I,
                 ).groups()
                 if ref1[0].find("#") == -1:
                     bugs.append(bug.strip())
             for ref1 in re.findall(
-                r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title|[2-4])=[^}]+?}}</ref>)',
+                r'(<ref( *name=".*?")? *> *\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title|[2-4])=[^}]+?}} *</ref>)',
                 r,
                 re.I,
             ):
@@ -488,7 +488,7 @@ def main(lang: _Lang) -> None:
             t = _page.text()
             t_bak = t
             for ref1 in re.findall(
-                r'(<ref( *name=".*?")? *>\{\{bug\|[^}]+?\{(</code>|[^<])+?}}</ref>)',
+                r'(<ref( *name=".*?")? *> *\{\{bug\|[^}]+?\{(</code>|[^<])+?}} *</ref>)',
                 t,
                 re.I,
             ):
@@ -515,7 +515,7 @@ def main(lang: _Lang) -> None:
                 if ref1[0].find("#") == -1 and ref1[0].find("|archive=") == -1:
                     t = t.replace(z, ref1[0])
             for ref1 in re.findall(
-                r'(<ref( *name=".*?")? *>\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title|[2-4])=[^}]+?}}</ref>)',
+                r'(<ref( *name=".*?")? *> *\{\{bug\|([A-Za-z0-9-]+)[^{}]*\|(res|text|title|[2-4])=[^}]+?}} *</ref>)',
                 t,
                 re.I,
             ):
@@ -541,7 +541,7 @@ def main(lang: _Lang) -> None:
                 if ref1[0].find("#") == -1 and ref1[0].find("|archive=") == -1:
                     t = t.replace(ref1[0], f"<ref{ref1[1]}>{bug_code}</ref>")
             for ref in re.findall(
-                r'(<ref( *name=".*?")? *>\{\{bug\|([A-Z0-9-]+?)(\|([^<]+?)}}</ref>|}}</ref>))',
+                r'(<ref( *name=".*?")? *> *\{\{bug\|([A-Z0-9-]+?)(\|([^<]+?)}} *</ref>|}} *</ref>))',
                 t,
                 re.I,
             ):
