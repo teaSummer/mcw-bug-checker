@@ -1,14 +1,33 @@
-from pathlib import Path
-from typing import Callable, Iterable, Literal
-import json
 import logging
+from pathlib import Path
+from typing import Callable, Literal, Sequence
+
+import orjson
 import requests
+from requests.cookies import RequestsCookieJar
+
+type Need = Literal[
+    "title",
+    "description_html",
+    "description_json",
+    "resolution",
+    "status",
+    "confirmation",
+    "fix_versions",
+    "affects_versions",
+    "issue_links",
+    "attachments",
+    "created_at",
+    "updated_at",
+    "resolved_at",
+    "key",
+]
 
 
 def jira_api(
     *,
     project: str,
-    bugs: Iterable[str] = [],
+    bugs: Sequence[str] = (),
     search: str | None = None,
     bugs_size_per_chunk: int = 200,
     legacy_mode: bool = False,
@@ -20,7 +39,7 @@ def jira_api(
         )
         return response.json()
 
-    def public(bugs: Iterable[str]) -> list[dict]:
+    def public(bugs: Sequence[str]) -> list[dict]:
         response = requests.post(
             "https://bugs.mojang.com/api/jql-search-post",
             json={
@@ -34,7 +53,7 @@ def jira_api(
         return response.json()["issues"]
 
     def servicedesk(bug: str) -> dict:
-        def authenticate() -> requests.cookies.RequestsCookieJar:
+        def authenticate() -> RequestsCookieJar:
             response = requests.post(
                 "https://report.bugs.mojang.com/jsd-login/v1/authentication/authenticate",
                 json={
@@ -79,34 +98,14 @@ def jira_api(
         return [legacy(bug) for bug in bugs]
     try:
         return public(bugs)
-    except:
+    except Exception:
         return [servicedesk(bug) for bug in bugs]
 
 
 def convert(
     *,
-    issues: Iterable[dict],
-    needs: (
-        Iterable[
-            Literal[
-                "title",
-                "description_html",
-                "description_json",
-                "resolution",
-                "status",
-                "confirmation",
-                "fix_versions",
-                "affects_versions",
-                "issue_links",
-                "attachments",
-                "created_at",
-                "updated_at",
-                "resolved_at",
-                "key",
-            ]
-        ]
-        | Literal["all"]
-    ) = "all",
+    issues: Sequence[dict],
+    needs: Sequence[Need] | Literal["all"] = "all",
 ) -> dict:
     result = {}
     if needs == "all":
@@ -116,9 +115,7 @@ def convert(
     for i in issues:
         result[i["key"]] = {}
 
-    def field(name: str, method: Callable | None = None) -> None:
-        if name not in needs:
-            return
+    def field(name: Need, method: Callable) -> None:
         for i in issues:
             result[i["key"]][name] = method(i)
 
@@ -163,5 +160,6 @@ if __name__ == "__main__":
     )
     result = convert(issues=result, needs=("title", "affects_versions"))
 
-    with open(base_dir / "jira_api.json", "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
+    base_dir.joinpath("jira_api.json").write_bytes(
+        orjson.dumps(result, option=orjson.OPT_INDENT_2)
+    )
