@@ -1,9 +1,4 @@
 {
-  "wiki_useragent": "TeaEvebot/1.0 (hi.teasu@gmail.com)",
-  "wiki_bot_username": "TeaEvebot",
-  "wiki_bot_password": "",
-  "sdjira_account_email": "",
-  "sdjira_account_password": "",
   "sites": {
     "en": {
       "enabled": false,
@@ -57,7 +52,8 @@
       "log.warning.skip": "Unenabled; skipped.",
       "log.warning.retry": "Retrying {} - Attempt {}/{}",
       "log.error": "({}/{}) Error occurred when processing {}.",
-      "log.error.bot_config": "Bot username or password is not set.",
+      "log.error.bot_config": "Bot username or password is not set in environment variables.",
+      "log.error.invalid_boolean": "The value of environment variable {} is invalid, it can only be 'true' or 'false'.",
       "log.error.no_duplicates": "Failed to resolve duplicate for bug {} on '{}' page.",
       "log.error.no_wiki_page": "({}/{}) No wiki page named '{}' exists.",
       "log.error.switch_to_single": "Error occurred when processing {} of project {}, switched to single-requesting mode."
@@ -72,7 +68,8 @@
       "log.warning.skip": "未启用，已跳过。",
       "log.warning.retry": "正在重试 {} - 第{}/{}次尝试",
       "log.error": "（{}/{}）处理 {} 时发生错误。",
-      "log.error.bot_config": "未配置机器人用户名或密码。",
+      "log.error.bot_config": "未在环境变量中配置机器人用户名或密码。",
+      "log.error.invalid_boolean": "环境变量 {} 的值无效，其只能为“true”或“false”。",
       "log.error.no_duplicates": "无法解析 “{}” 页面上漏洞 {} 的重复项。",
       "log.error.no_wiki_page": "（{}/{}）没有名为 “{}” 的wiki页面。",
       "log.error.switch_to_single": "处理 {} 项目中的 {} 时发生错误，已切换为单请求模式。"

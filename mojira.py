@@ -1,10 +1,14 @@
 import logging
+import os
 from pathlib import Path
 from typing import Callable, Literal, Sequence
 
+from dotenv import load_dotenv
 import orjson
 import requests
 from requests.cookies import RequestsCookieJar
+
+from checker import Config
 
 type Need = Literal[
     "title",
@@ -57,8 +61,8 @@ def jira_api(
             response = requests.post(
                 "https://report.bugs.mojang.com/jsd-login/v1/authentication/authenticate",
                 json={
-                    "email": sdjira_email,
-                    "password": sdjira_password,
+                    "email": os.getenv("SDJIRA_ACCOUNT_EMAIL"),
+                    "password": os.getenv("SDJIRA_ACCOUNT_PASSWORD"),
                 },
                 headers={"Content-Type": "application/json"},
             )
@@ -137,21 +141,17 @@ def convert(
 
 
 if __name__ == "__main__":
-    sdjira_email = ""  # If needs Service Desk Jira, please fill in.
-    sdjira_password = ""  # If needs Service Desk Jira, please fill in.
+    load_dotenv()
     fix_version = "26.1 Snapshot 10"  # Example value: "26.1 Snapshot 1"
 
     base_dir = Path(__file__).parent
+    config_file = base_dir / os.getenv("CONFIG_FILE", "./config.json")
+    config = Config.model_validate(orjson.loads(config_file.read_bytes()))
+    output_dir = base_dir / os.getenv("OUTPUT_DIR", "./output")
+    output_dir.mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger()
-    sdjira_cookies = None  # Do not change.
-    sdjira_portals = {
-        "MC": 2,
-        "MCPE": 6,
-        "MCL": 7,
-        "REALMS": 9,
-        "WEB": 10,
-        "BDS": 4,
-    }
+    sdjira_portals = config.sdjira_portals
+    sdjira_cookies = None
 
     result = jira_api(
         project="MC",
@@ -160,6 +160,6 @@ if __name__ == "__main__":
     )
     result = convert(issues=result, needs=("title", "affects_versions"))
 
-    base_dir.joinpath("jira_api.json").write_bytes(
+    output_dir.joinpath("jira_api.json").write_bytes(
         orjson.dumps(result, option=orjson.OPT_INDENT_2)
     )

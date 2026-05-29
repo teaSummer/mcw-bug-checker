@@ -4,4 +4,4 @@ A project to automatically check for resolutions of `{{bug}}` templates in Minec
 
 ## Configurations
 
-See [config.json](config.json).
+See [.env](.env) [config.json](config.json).

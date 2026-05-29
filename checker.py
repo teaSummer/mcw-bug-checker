@@ -2,11 +2,11 @@ import copy
 import logging
 import os
 from pathlib import Path
-from typing import Any, Literal, Optional, Sequence
+from typing import Any, Literal, Sequence
 
 import colorlog
+from dotenv import load_dotenv
 from mwclient import Site
-from mwclient.page import Page
 import mwparserfromhell as mw
 from mwparserfromhell.nodes import Tag
 import orjson
@@ -30,22 +30,9 @@ class Config(BaseModel):
         edit_wiki: bool = True
         search_exclusives: list[str] = Field(default_factory=list)
 
-    class _SaveFor(BaseModel):
-        bugs: Path | str = Field(default=Path(__file__).parent / "bugs.txt")
-        bug_data: Path | str = Field(default=Path(__file__).parent / "data.json")
-
     sites: dict[Lang, _Site]
-    wiki_bot_username: str
     sdjira_portals: dict[str, int]
     locales: dict[Lang, dict[str, str]]
-    as_bot: bool = True
-    wiki_useragent: Optional[str] = None
-    wiki_bot_password: Optional[str] = None
-    sdjira_account_email: Optional[str] = None
-    sdjira_account_password: Optional[str] = None
-    bugs_size_per_chunk: int = 100
-    save_for: _SaveFor = Field(default_factory=_SaveFor)
-    max_tries: int = 5
 
 
 def locale(
@@ -100,7 +87,7 @@ def mojira(
                 "advanced": True,
                 "project": project,
                 "search": f"key in ({','.join(bugs)})",
-                "maxResults": config.bugs_size_per_chunk,
+                "maxResults": int(os.getenv("BUGS_SIZE_PER_CHUNK", 100)),
             },
             headers={"Content-Type": "application/json"},
         )
@@ -110,7 +97,10 @@ def mojira(
         def authenticate() -> RequestsCookieJar:
             response = requests.post(
                 "https://report.bugs.mojang.com/jsd-login/v1/authentication/authenticate",
-                json={"email": sdjira_email, "password": sdjira_password},
+                json={
+                    "email": os.getenv("SDJIRA_ACCOUNT_EMAIL"),
+                    "password": os.getenv("SDJIRA_ACCOUNT_PASSWORD"),
+                },
                 headers={"Content-Type": "application/json"},
             )
             assert response.cookies
@@ -199,8 +189,8 @@ def update_ref_bug(
                         "fields"
                     ]["resolution"]
                     dup_res = dup_res_data["name"] if dup_res_data else None
-                    # 修改模板参数
-                    template.add(1, dup_key)
+                    # 修改漏洞编号
+                    template.get(1).value = dup_key
                     if dup_res:
                         template.add(4, dup_res)
                     updated = True
@@ -222,30 +212,35 @@ def update_ref_bug(
     return False
 
 
-def main(lang: Lang) -> None:
+def main(lang: Lang, edit_as_bot: bool = True) -> None:
     site = Site(
         f"{lang + '.' if lang != 'en' else ''}minecraft.wiki",
         path="/",
-        clients_useragent=config.wiki_useragent,
+        clients_useragent=os.getenv("WIKI_USERAGENT"),
     )
     logger = get_logger()
     if config.sites[lang].edit_wiki or config.sites[lang].record_bug_hole:
-        bot_password = config.wiki_bot_password or os.getenv("WIKI_BOT_PASSWORD")
-        if not config.wiki_bot_username or not bot_password:
+        if not os.getenv("WIKI_BOT_USERNAME") or not os.getenv("WIKI_BOT_PASSWORD"):
             raise ValueError(locale(lang, "log.error.bot_config"))
-        site.clientlogin(username=config.wiki_bot_username, password=bot_password)
+        site.clientlogin(
+            username=os.getenv("WIKI_BOT_USERNAME"),
+            password=os.getenv("WIKI_BOT_PASSWORD"),
+        )
         site.site_init()
+        if "bot" not in site.rights:
+            edit_as_bot = False
 
     # 搜索
     pages = []
     conditions = [
-        r'insource:/\<ref( *name=".*?")? *> *\{\{%(bug)s\|([A-Za-z0-9-]+?)(\|[^\<]+?}} *\<\/ref>|}} *\<\/ref>)|\<ref( *name=".*?")? *> *\{\{%(bug)s\|[^{}]+\|(res|text|title|[2-4])=[^}]+?}} *\<\/ref>|\<ref( *name=".*?")? *> *\{\{%(bug)s\|[^}]+?\{(\<\/code>|[^\<])+?}} *\<\/ref>/'
-        % {"bug": config.sites[lang].bug_template}
+        r"insource:/\<ref[^>]*>[^<>]*?\{\{\s*%s\s*\|/" % config.sites[lang].bug_template
     ]
     conditions.extend(config.sites[lang].search_exclusives)
     for ns in config.sites[lang].namespaces:
         for page in site.search(" -".join(conditions), namespace=str(ns)):
-            pages.append(page.get("title"))
+            if not isinstance(page, dict):
+                continue
+            pages.append(page["title"])
     pages = sorted(set(pages))
 
     def wiki(pagename: str) -> list[str]:
@@ -341,7 +336,7 @@ def main(lang: Lang) -> None:
         for bug in bugs_raw:
             p = bug.split("-")[0]
             projects.setdefault(p, [[]])
-            if len(projects[p][-1]) >= config.bugs_size_per_chunk:
+            if len(projects[p][-1]) >= int(os.getenv("BUGS_SIZE_PER_CHUNK", 100)):
                 projects[p].append([])
             projects[p][-1].append(bug.strip())
 
@@ -379,24 +374,24 @@ def main(lang: Lang) -> None:
 
             code = mw.parse(original_text)
             modified = False
-
-            if code.filter_comments() or code.filter_templates(
-                matches=lambda template: template.name.matches("void")
-            ):
-                continue
-
             for ref in code.filter_tags(matches=lambda tag: tag.tag == "ref"):
                 # 提取漏洞编号
                 inner_code = copy.deepcopy(ref.contents)
+                if inner_code.filter_comments() or inner_code.filter_templates(
+                    matches=lambda template: template.name.matches("void")
+                ):
+                    continue
                 for template in inner_code.filter_templates():
-                    if template.name.matches(
+                    if not template.name.matches(
                         config.sites[lang].bug_template
-                    ) and template.has(1):
-                        bug_id = template.get(1).value.strip()
-                        if bug_id in status_map:
-                            status = status_map[bug_id]
-                            if update_ref_bug(ref, bug_id, status, lang, pagename):
-                                modified = True
+                    ) or not template.has(1):
+                        continue
+                    bug_id = template.get(1).value.strip()
+                    if bug_id not in status_map:
+                        continue
+                    status = status_map[bug_id]
+                    if update_ref_bug(ref, bug_id, status, lang, pagename):
+                        modified = True
 
             if modified:
                 new_text = str(code)
@@ -404,11 +399,11 @@ def main(lang: Lang) -> None:
                     new_text,
                     summary=locale(
                         lang,
-                        "summary.bot" if config.as_bot else "summary.human",
+                        "summary.bot" if edit_as_bot else "summary.human",
                         locale(lang, "summary.message.edit"),
                     ),
                     minor=False,
-                    bot=config.as_bot,
+                    bot=edit_as_bot,
                 )
                 logger.info(locale(lang, "log.info", current, total, pagename))
                 continue
@@ -430,7 +425,7 @@ def main(lang: Lang) -> None:
             hole_version,
             summary=locale(
                 lang,
-                "summary.bot" if config.as_bot else "summary.human",
+                "summary.bot" if edit_as_bot else "summary.human",
                 locale(
                     lang,
                     "summary.message.edit.hole_page",
@@ -438,32 +433,39 @@ def main(lang: Lang) -> None:
                 ),
             ),
             minor=False,
-            bot=config.as_bot,
+            bot=edit_as_bot,
         )
 
 
 if __name__ == "__main__":
+    load_dotenv()
     base_dir = Path(__file__).parent
-    config = Config.model_validate(
-        orjson.loads(base_dir.joinpath("config.json").read_bytes())
-    )
-    bugs_file = base_dir / config.save_for.bugs
-    bug_data_file = base_dir / config.save_for.bug_data
-    max_tries = config.max_tries
+    logger = get_logger()
+    config_file = base_dir / os.getenv("CONFIG_FILE", "./config.json")
+    config = Config.model_validate(orjson.loads(config_file.read_bytes()))
 
-    sdjira_email = config.sdjira_account_email or os.getenv("SDJIRA_EMAIL")
-    sdjira_password = config.sdjira_account_password or os.getenv("SDJIRA_PASSWORD")
+    max_tries = int(os.getenv("MAX_TRIES", 5))
     sdjira_cookies = None
 
-    bugs_file.parent.mkdir(parents=True, exist_ok=True)
-    bug_data_file.parent.mkdir(parents=True, exist_ok=True)
-    bugs_file.unlink(missing_ok=True)
-    bug_data_file.unlink(missing_ok=True)
+    output_dir = base_dir / os.getenv("OUTPUT_DIR", "./output")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    bugs_file = output_dir / "bugs.txt"
+    bug_data_file = output_dir / "bug_data.json"
 
     for lang in config.sites:
         logger = get_logger()
+        edit_as_bot = os.getenv("EDIT_AS_BOT", "true").lower()
         logger.info(locale(lang, "log.info.start", lang))
+
         if not config.sites[lang].enabled:
             logger.warning(locale(lang, "log.warning.skip"))
             continue
-        main(lang)
+        if edit_as_bot not in ("false", "true"):
+            logger.error(locale(lang, "log.error.invalid_boolean", "EDIT_AS_BOT"))
+            continue
+        if edit_as_bot == "true":
+            edit_as_bot = True
+        else:
+            edit_as_bot = False
+
+        main(lang, edit_as_bot)
