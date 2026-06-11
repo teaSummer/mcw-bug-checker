@@ -87,7 +87,7 @@ def mojira(
                 "advanced": True,
                 "project": project,
                 "search": f"key in ({','.join(bugs)})",
-                "maxResults": int(os.getenv("BUGS_SIZE_PER_CHUNK", 100)),
+                "maxResults": int(os.getenv("BUGS_SIZE_PER_CHUNK") or 100),
             },
             headers={"Content-Type": "application/json"},
         )
@@ -336,7 +336,7 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
         for bug in bugs_raw:
             p = bug.split("-")[0]
             projects.setdefault(p, [[]])
-            if len(projects[p][-1]) >= int(os.getenv("BUGS_SIZE_PER_CHUNK", 100)):
+            if len(projects[p][-1]) >= int(os.getenv("BUGS_SIZE_PER_CHUNK") or 100):
                 projects[p].append([])
             projects[p][-1].append(bug.strip())
 
@@ -399,7 +399,7 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
                     new_text,
                     summary=locale(
                         lang,
-                        "summary.bot" if edit_as_bot else "summary.human",
+                        "summary.bot",
                         locale(lang, "summary.message.edit"),
                     ),
                     minor=False,
@@ -425,7 +425,7 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
             hole_version,
             summary=locale(
                 lang,
-                "summary.bot" if edit_as_bot else "summary.human",
+                "summary.bot",
                 locale(
                     lang,
                     "summary.message.edit.hole_page",
@@ -433,7 +433,7 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
                 ),
             ),
             minor=False,
-            bot=edit_as_bot,
+            bot=True,
         )
 
 
@@ -441,20 +441,20 @@ if __name__ == "__main__":
     load_dotenv()
     base_dir = Path(__file__).parent
     logger = get_logger()
-    config_file = base_dir / os.getenv("CONFIG_FILE", "./config.json")
+    config_file = base_dir / (os.getenv("CONFIG_FILE") or "./config.json")
     config = Config.model_validate(orjson.loads(config_file.read_bytes()))
 
-    max_tries = int(os.getenv("MAX_TRIES", 5))
+    max_tries = int(os.getenv("MAX_TRIES") or 5)
     sdjira_cookies = None
 
-    output_dir = base_dir / os.getenv("OUTPUT_DIR", "./output")
+    output_dir = base_dir / (os.getenv("OUTPUT_DIR") or "./output")
     output_dir.mkdir(parents=True, exist_ok=True)
     bugs_file = output_dir / "bugs.txt"
     bug_data_file = output_dir / "bug_data.json"
 
     for lang in config.sites:
         logger = get_logger()
-        edit_as_bot = os.getenv("EDIT_AS_BOT", "true").lower()
+        edit_as_bot = (os.getenv("EDIT_AS_BOT") or "true").lower()
         logger.info(locale(lang, "log.info.start", lang))
 
         if not config.sites[lang].enabled:

@@ -44,7 +44,6 @@
   "locales": {
     "en": {
       "summary.bot": "Bot: {}",
-      "summary.human": "{}",
       "summary.message.edit": "Check {{{{[[Template:Bug|bug]]}}}} templates",
       "summary.message.edit.hole_page": "Update data for A Bug's Life",
       "log.info": "({}/{}) {}",
@@ -60,7 +59,6 @@
     },
     "zh": {
       "summary.bot": "机器人：{}",
-      "summary.human": "{}",
       "summary.message.edit": "检查{{{{[[Template:Bug|bug]]}}}}模板",
       "summary.message.edit.hole_page": "更新虫虫危机数据",
       "log.info": "（{}/{}）{}",
