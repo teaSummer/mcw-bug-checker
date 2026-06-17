@@ -2,6 +2,7 @@ import copy
 import logging
 import os
 from pathlib import Path
+import time
 from typing import Any, Literal, Sequence
 
 import colorlog
@@ -166,9 +167,32 @@ def extract_bugs_from_page(wikitext: str, lang: Lang) -> list[str]:
 
 def update_ref_bug(
     ref_node: Tag, bug_id: str, status: str | None, lang: Lang, pagename: str = ""
-):
+) -> None:
     inner_code = copy.deepcopy(ref_node.contents)
     updated = False
+
+    def give_resolution(status: str | None) -> None:
+        if template.has("res"):
+            template.remove("res")
+        if template.has(4):
+            template.remove(4)
+        if status is None:
+            if template.has(3) and not template[3].value.strip():
+                template.remove(3)
+                if template.has(2) and not template[2].value.strip():
+                    template.remove(2)
+            return
+        if template.has("text"):
+            template.add(2, template["text"].value)
+            template.remove("text")
+        if template.has("title"):
+            template.add(3, template["title"].value)
+            template.remove("title")
+        if not template.has(2):
+            template.add(2, "")
+        if not template.has(3):
+            template.add(3, "")
+        template.add(4, status)
 
     for template in inner_code.filter_templates():
         if (
@@ -176,10 +200,6 @@ def update_ref_bug(
             and template.has(1)
             and template.get(1).value.strip() == bug_id
         ):
-            if template.has(4):
-                template.remove(4)
-            if template.has("res"):
-                template.remove("res")
             if status == "Duplicate":
                 # 处理重复项，替换为目标漏洞
                 try:
@@ -191,25 +211,22 @@ def update_ref_bug(
                     dup_res = dup_res_data["name"] if dup_res_data else None
                     # 修改漏洞编号
                     template.get(1).value = dup_key
-                    if dup_res:
-                        template.add(4, dup_res)
+                    give_resolution(dup_res)
                     updated = True
                 except Exception:
                     logger.error(
                         locale(lang, "log.error.no_duplicates", bug_id, pagename)
                     )
-                    return False
             else:
-                if status is not None:
-                    template.add(4, status)
+                give_resolution(status)
                 updated = True
             break
 
     if updated:
         new_ref_content = inner_code.strip()
         ref_node.contents = new_ref_content
-        return True
-    return False
+        return
+    return
 
 
 def main(lang: Lang, edit_as_bot: bool = True) -> None:
@@ -373,13 +390,10 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
                 continue
 
             code = mw.parse(original_text)
-            modified = False
             for ref in code.filter_tags(matches=lambda tag: tag.tag == "ref"):
                 # 提取漏洞编号
                 inner_code = copy.deepcopy(ref.contents)
-                if inner_code.filter_comments() or inner_code.filter_templates(
-                    matches=lambda template: template.name.matches("void")
-                ):
+                if len(inner_code.filter(recursive=False)) != 1:
                     continue
                 for template in inner_code.filter_templates():
                     if not template.name.matches(
@@ -390,22 +404,35 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
                     if bug_id not in status_map:
                         continue
                     status = status_map[bug_id]
-                    if update_ref_bug(ref, bug_id, status, lang, pagename):
-                        modified = True
+                    update_ref_bug(ref, bug_id, status, lang, pagename)
 
-            if modified:
-                new_text = str(code)
-                page.edit(
-                    new_text,
-                    summary=locale(
-                        lang,
-                        "summary.bot",
-                        locale(lang, "summary.message.edit"),
-                    ),
-                    minor=False,
-                    bot=edit_as_bot,
-                )
-                logger.info(locale(lang, "log.info", current, total, pagename))
+            new_text = str(code)
+            if original_text != new_text:
+                tries = 0
+                while tries < max_tries:
+                    try:
+                        page.edit(
+                            new_text,
+                            summary=locale(
+                                lang,
+                                "summary.bot",
+                                locale(lang, "summary.message.edit"),
+                            ),
+                            minor=False,
+                            bot=edit_as_bot,
+                        )
+                        logger.info(locale(lang, "log.info", current, total, pagename))
+                        break
+                    except Exception:
+                        tries += 1
+                        logger.warning(
+                            locale(
+                                lang, "log.warning.retry", pagename, tries, max_tries
+                            )
+                        )
+                        time.sleep(5)
+                else:
+                    logger.warning(locale(lang, "log.info", current, total, pagename))
                 continue
             logger.warning(locale(lang, "log.info", current, total, pagename))
 
