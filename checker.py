@@ -225,8 +225,6 @@ def update_ref_bug(
     if updated:
         new_ref_content = inner_code.strip()
         ref_node.contents = new_ref_content
-        return
-    return
 
 
 def main(lang: Lang, edit_as_bot: bool = True) -> None:
@@ -418,7 +416,6 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
                                 "summary.bot",
                                 locale(lang, "summary.message.edit"),
                             ),
-                            minor=False,
                             bot=edit_as_bot,
                         )
                         logger.info(locale(lang, "log.info", current, total, pagename))
@@ -442,14 +439,14 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
         hole_bugs = ""
         for key, value in bug_data.items():
             hole_bugs = hole_bugs + f"<option>{key}|{value}</option>\n"
-        hole_version = f"""
-<choose {{{{{{#if:{{{{{{uncached|}}}}}}|uncached|}}}}}}>
-{hole_bugs.strip()}
+        hole_version = """
+<choose {{#if:{{{uncached|}}}|uncached|}}>
+%s
 <choicetemplate>User:TeaSummer/Bug|hole=1</choicetemplate>
-</choose><noinclude>{{{{documentation}}}}
+</choose><noinclude>{{documentation}}
 </noinclude>""".strip()
         hole_page.edit(
-            hole_version,
+            hole_version % hole_bugs.strip(),
             summary=locale(
                 lang,
                 "summary.bot",
@@ -459,7 +456,6 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
                     fallback=locale(lang, "summary.message.edit"),
                 ),
             ),
-            minor=False,
             bot=True,
         )
 
