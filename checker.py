@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from mwclient import Site
 import mwparserfromhell as mw
 from mwparserfromhell.nodes import Tag
+from mwparserfromhell.wikicode import Wikicode
 import orjson
 from pydantic import BaseModel, Field
 import requests
@@ -173,8 +174,12 @@ def update_ref_bug(
 
     def give_resolution(status: str | None) -> None:
         if template.has("res"):
+            if resolve(template["res"].value) == status:
+                return
             template.remove("res")
         if template.has(4):
+            if resolve(template[4].value) == status:
+                return
             template.remove(4)
         if status is None:
             if template.has(3) and not template[3].value.strip():
@@ -225,6 +230,13 @@ def update_ref_bug(
     if updated:
         new_ref_content = inner_code.strip()
         ref_node.contents = new_ref_content
+
+
+def resolve(res: str | Wikicode) -> str:
+    res = res.strip().replace("&#39;", "'")
+    if res == "Works As Intended":
+        return "WAI"
+    return res
 
 
 def main(lang: Lang, edit_as_bot: bool = True) -> None:
@@ -302,11 +314,7 @@ def main(lang: Lang, edit_as_bot: bool = True) -> None:
                 resolution = bug["fields"].get("resolution")
                 status = None
                 if resolution and resolution.get("name") != "Unresolved":
-                    status = (
-                        resolution["name"]
-                        .replace("Won&#39;t Fix", "Won't Fix")
-                        .replace("Works As Intended", "WAI")
-                    )
+                    status = resolve(resolution["name"])
                 out.append((key, status))
                 logger.info(
                     locale(
