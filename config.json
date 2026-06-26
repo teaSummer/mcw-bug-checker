@@ -5,11 +5,7 @@
       "namespaces": [
         0
       ],
-      "record_bug_hole": false,
-      "search_exclusives": [
-        "hastemplate:Joke_feature",
-        "hastemplate:April_Fools"
-      ]
+      "record_bug_hole": false
     },
     "zh": {
       "enabled": true,
@@ -24,13 +20,7 @@
         10006,
         10010
       ],
-      "record_bug_hole": "User:TeaSummer/A Bug's Life",
-      "search_exclusives": [
-        "intitle:*前",
-        "intitle:/[^洋]（旧版）/",
-        "hastemplate:Joke_feature",
-        "hastemplate:April_Fools"
-      ]
+      "record_bug_hole": "User:TeaSummer/A Bug's Life"
     }
   },
   "sdjira_portals": {
